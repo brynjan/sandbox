@@ -1,0 +1,19 @@
+@import "../chameleon/styles.css";
+
+@import "components/components.css"; 
+
+
+.v-tree-checkboxed .v-tree-node-caption-unchecked div span {
+    background: url("img/unchecked.png") no-repeat;
+    padding-left: 24px;
+}
+
+.v-tree-checkboxed .v-tree-node-caption-checked div span {
+    background: url("img/checked.png") no-repeat;
+    padding-left: 24px;
+}
+
+.v-tree-checkboxed .v-tree-node-caption-partialcheck div span {
+    background: url("img/partialcheck.png") no-repeat;
+    padding-left: 24px;
+}
