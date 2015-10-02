@@ -1,4 +1,4 @@
-package no.progconsult.camel.route;
+package no.progconsult.camel.fileroute;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
