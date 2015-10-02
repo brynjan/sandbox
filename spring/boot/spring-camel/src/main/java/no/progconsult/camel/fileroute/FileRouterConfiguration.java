@@ -19,7 +19,7 @@ public class FileRouterConfiguration {
  
       @Override
       public void configure() throws Exception {
-        from("file:data/inbox?noop=true").to("file:data/outbox");
+        from("file:data/inbox?noop=true&delay=5000").to("file:data/outbox");
 //        from("jms:invoices").to("file:/invoices");
       }
  
