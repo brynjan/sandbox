@@ -1,4 +1,4 @@
-package no.progconsult.camel;
+package no.progconsult.camel.heartbeat;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

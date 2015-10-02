@@ -2,7 +2,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="Suite1">
-    <test name="test1">
+    <test name="unittest">
         <groups>
             <run>
                 <exclude name="disabled"/>
@@ -14,7 +14,7 @@
         </groups>
 
         <packages>
-            <package name="demo.*"></package>
+            <package name="no.*"></package>
         </packages>
     </test>
 </suite>

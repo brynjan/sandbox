@@ -1,6 +1,7 @@
-package no.progconsult.camel;
+package no.progconsult.camel.heartbeat;
 
 
+import no.progconsult.camel.SpringCamelApplication;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
@@ -25,12 +26,12 @@ public class HearBeatControllerTest extends AbstractTestNGSpringContextTests {
     @Value("${local.server.port}")
     private int port;
 
-    @Test(groups = {"unittest"})
+    @Test(groups = {"disabled"})
     public void testConnectOracle() {
         System.out.println("testConnectOracle()");
     }
 
-    @Test(groups = {"integrationtest"})
+    @Test
     public void testHeartbeat() {
         ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
                 "http://localhost:" + this.port + "/heartbeat", String.class);
