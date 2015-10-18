@@ -1,7 +1,6 @@
 package no.progconsult.camel.config;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.spring.javaconfig.CamelConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
