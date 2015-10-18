@@ -2,7 +2,6 @@ package no.progconsult.camel.config;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.spring.javaconfig.CamelConfiguration;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -11,7 +10,8 @@ import org.springframework.context.annotation.Configuration;
  * @version 
  */
 @Configuration
-@ComponentScan("no.progconsult.camel")
+// not neccessary to do componentscan since it is done in springconfig already.
+//@ComponentScan("no.progconsult.camel")
 public class MyRouteConfig extends CamelConfiguration{
      
 

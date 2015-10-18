@@ -11,7 +11,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 
 @Configuration
-@ComponentScan(basePackages = {"no.progconsult.camel"})
+@ComponentScan("no.progconsult.camel")
 @PropertySource(value = "classpath:application.properties")
 public class SpringConfig {
 
