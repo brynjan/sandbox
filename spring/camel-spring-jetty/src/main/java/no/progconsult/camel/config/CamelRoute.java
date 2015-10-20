@@ -3,6 +3,7 @@ package no.progconsult.camel.config;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,24 +12,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class CamelRoute extends RouteBuilder {
 
+    @Value("${startEndpoint}")
+    private String uri;
+
+
     public void configure() {
-        // you can configure the route rule with Java DSL here
+        from("file:target/data?noop=true").to("seda:test.MyQueue");
+        from("seda:test.MyQueue").to("file://target/test?noop=true");
 
-        // populate the message queue with some messages
-        from("file:target/data?noop=true").
-                                                  to("seda:test.MyQueue");
-
-        from("seda:test.MyQueue").
-                                         to("file://target/test?noop=true");
-
-        from("direct:start").process(new Processor() {
+        from("{{startEndpoint}}").process(new Processor() {
             public void process(Exchange exchange) throws Exception {
-                System.out.println("direct:start");
+                System.out.println("direct:test");
             }
-        });
-
-//        // set up a listener on the file component
-//        from("file://target/test?noop=true").
-//                                                    bean(new SomeBean());
+        }).wireTap("activemq:wiretap").to("activemq:complete");
     }
 }
