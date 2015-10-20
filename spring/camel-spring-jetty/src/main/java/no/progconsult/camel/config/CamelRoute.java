@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CamelRoute extends RouteBuilder {
 
-    @Value("${startEndpoint}")
+    @Value("${test}")
     private String uri;
 
 
