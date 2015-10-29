@@ -1,0 +1,1 @@
+The project tests Endpoint.publish of both codefirst and wsdl first
