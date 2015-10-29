@@ -16,7 +16,7 @@ import java.util.List;
  * @author bno
  */
 @ContextConfiguration(
-        classes = {TestConfig.class, PropertiesConfig.class},
+        classes = {SedaTestConfig.class, PropertiesConfig.class},
         loader = CamelSpringDelegatingTestContextLoader.class, inheritLocations = false)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class AbstractRouteTest extends AbstractCamelTestNGSpringContextTests {
