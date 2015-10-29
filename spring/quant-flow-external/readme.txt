@@ -1,0 +1,1 @@
+Simple camel application using spring boot
