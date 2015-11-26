@@ -23,17 +23,30 @@ import java.util.Properties;
 @Configuration
 @ComponentScan("no.progconsult.camel")
 @PropertySource(value = "classpath:application.properties")
-public class CamelConfig extends CamelConfiguration{
+public class AbstractCamelConfig extends CamelConfiguration{
 
     @Autowired
-    private Environment environment;
+    Environment environment;
 
-    @Override
-    protected void setupCamelContext(CamelContext camelContext) throws Exception {
-        super.setupCamelContext(camelContext);
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
 
-    public void afterPropertiesSet() throws Exception {
-        // just to make SpringDM happy do nothing here
+    @Bean
+    PropertiesParser propertiesParser() {
+        return new DefaultPropertiesParser() {
+            @Override
+            public String parseProperty(String key, String value, Properties properties) {
+                return environment.getProperty(key);
+            }
+        };
+    }
+
+    @Bean
+    PropertiesComponent properties() {
+        PropertiesComponent properties = new PropertiesComponent();
+        properties.setPropertiesParser(propertiesParser());
+        return properties;
     }
 }
