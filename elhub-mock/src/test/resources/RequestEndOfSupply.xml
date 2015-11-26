@@ -1,0 +1,25 @@
+<urn:PollForDataRequest xmlns:urn="urn:no:elhub:emif:wsdl:polling:marketprocesses:v1" xmlns:urn1="urn:no:elhub:emif:PollForData:v1" xmlns:urn2="urn:no:elhub:emif:common:AggregatedBusinessInformationEntities:v1">
+    <urn1:PollForData>
+        <urn1:Header>
+            <urn2:Identification>${=java.util.UUID.randomUUID().toString()}</urn2:Identification>
+            <urn2:DocumentType listAgencyIdentifier="6">21</urn2:DocumentType>
+            <urn2:Creation>${=javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar(GregorianCalendar.getInstance())}</urn2:Creation>
+            <urn2:PhysicalSenderEnergyParty>
+                <urn2:Identification schemeAgencyIdentifier="9">1234567890123</urn2:Identification>
+            </urn2:PhysicalSenderEnergyParty>
+            <urn2:JuridicalSenderEnergyParty>
+                <urn2:Identification schemeAgencyIdentifier="9">1234567890123</urn2:Identification>
+            </urn2:JuridicalSenderEnergyParty>
+            <urn2:JuridicalRecipientEnergyParty>
+                <urn2:Identification schemeAgencyIdentifier="9">9876543210123</urn2:Identification>
+            </urn2:JuridicalRecipientEnergyParty>
+        </urn1:Header>
+        <urn1:ProcessEnergyContext>
+            <urn2:EnergyBusinessProcess listAgencyIdentifier="89">POLL</urn2:EnergyBusinessProcess>
+            <urn2:EnergyBusinessProcessRole listAgencyIdentifier="6">DDQ</urn2:EnergyBusinessProcessRole>
+            <urn2:EnergyIndustryClassification>23</urn2:EnergyIndustryClassification>
+        </urn1:ProcessEnergyContext>
+        <urn1:Payload>
+        </urn1:Payload>
+    </urn1:PollForData>
+</urn:PollForDataRequest>
