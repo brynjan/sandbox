@@ -10,5 +10,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @ComponentScan("no.progconsult.camel")
-public class SpringConfig {
+@PropertySource(value = "classpath:application.properties")
+public class SpringConfig extends AbstractCamelConfig{
+
 }

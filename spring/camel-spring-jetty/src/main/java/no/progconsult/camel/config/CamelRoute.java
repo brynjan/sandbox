@@ -25,5 +25,7 @@ public class CamelRoute extends RouteBuilder {
                 System.out.println("direct:test");
             }
         }).wireTap("activemq:wiretap").to("activemq:complete");
+
+        from("activemq:start").to("activemq:stop");
     }
 }

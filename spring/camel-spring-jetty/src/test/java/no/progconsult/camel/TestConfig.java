@@ -1,9 +1,35 @@
 package no.progconsult.camel;
 
-import org.apache.camel.spring.javaconfig.CamelConfiguration;
+import no.progconsult.camel.config.AbstractCamelConfig;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-public class TestConfig extends CamelConfiguration {
+@PropertySource(value = "classpath:application.properties")
+public class TestConfig extends AbstractCamelConfig {
 
+//    @Autowired
+//    Environment environment;
+//
+//    @Bean
+//    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+//        return new PropertySourcesPlaceholderConfigurer();
+//    }
+//
+//    @Bean
+//    PropertiesParser propertiesParser() {
+//        return new DefaultPropertiesParser() {
+//            @Override
+//            public String parseProperty(String key, String value, Properties properties) {
+//                return environment.getProperty(key);
+//            }
+//        };
+//    }
+//
+//    @Bean
+//    PropertiesComponent properties() {
+//        PropertiesComponent properties = new PropertiesComponent();
+//        properties.setPropertiesParser(propertiesParser());
+//        return properties;
+//    }
 }
