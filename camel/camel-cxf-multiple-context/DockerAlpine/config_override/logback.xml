@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false" scanPeriod="60 seconds">
+    <property name="LOG_DIR" value="logs/"/>
+    <property name="appName" value="issuite-adapter-bimplus"/>
+
+    <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${appName}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${appName}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>250MB</totalSizeCap>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%thread] %-5level %logger{35} %X{camel.breadcrumbId} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="inoutLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${appName}-inOut.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${appName}-inOut-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>250MB</totalSizeCap>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%thread] %-5level %logger{35} %X{camel.breadcrumbId} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="no.progconsult.quant.flow.inoutlog.InOutLogRoute" additivity="false">
+         <appender-ref ref="inoutLogAppender"/>
+    </logger>
+
+    <logger name="org.eclipse.jetty" level="WARN"/>
+    <logger name="com.amazonaws.latency" level="WARN"/>
+    <logger name="com.amazonaws.metrics.internal.cloudwatch.PredefinedMetricTransformer" level="ERROR"/>
+
+    <!-- runapp.sh defaults this to INFO if envvar LOGBACK_EMBRIQ_LEVEL is not set-->
+    <logger name="no.progconsult" level="{LOGBACK_EMBRIQ_LEVEL}"/>
+
+    <root level="info">
+        <appender-ref ref="logfile"/>
+    </root>
+</configuration>
