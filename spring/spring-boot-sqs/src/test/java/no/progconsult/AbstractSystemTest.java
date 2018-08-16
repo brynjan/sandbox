@@ -19,7 +19,7 @@ import org.testng.annotations.BeforeSuite;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * @author <a href="mailto:brynjar.norum@embriq.no">Brynjar Norum</a> 2018-08-06.
+ * @author <a href="mailto:brynjar.norum@progconsult.no">Brynjar Norum</a> 2018-08-06.
  */
 @SpringBootTest(classes = {SpringBootSqsApplication.class, TestConfig.class})
 @TestPropertySource("classpath:springbootsqs-test.properties")
@@ -28,8 +28,6 @@ public abstract class AbstractSystemTest extends AbstractTestNGSpringContextTest
     private transient static final Logger LOG = getLogger(AbstractSystemTest.class);
 
     protected SqsServerMock sqsServerMock;
-
-    protected static final String sqsInQueueName = "embriq-test1-bno";
 
     @Autowired
     protected SqsAsyncClientMock sqsClientMock;

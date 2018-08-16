@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 
 /**
- * @author <a href="mailto:brynjar.norum@embriq.no">Brynjar Norum</a> 2018-08-06.
+ * @author <a href="mailto:brynjar.norum@progconsult.no">Brynjar Norum</a> 2018-08-06.
  */
 @Configuration
 public class TestConfig {

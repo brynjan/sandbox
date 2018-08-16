@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.annotations.Test;
 
 /**
- * @author <a href="mailto:brynjar.norum@embriq.no">Brynjar Norum</a> 2018-08-16.
+ * @author <a href="mailto:brynjar.norum@progconsult.no">Brynjar Norum</a> 2018-08-16.
  */
 public class ReceiveFromSQSTest extends AbstractSystemTest {
 
