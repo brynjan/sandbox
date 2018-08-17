@@ -1,6 +1,6 @@
 # Spring-boot-sqs
 Receive messages from sqs by using SimpleMessageListenerContainerFactory enabled by spring-boot and spring-cloud-aws-messaging.
-Added exponential back for retries.
+Added exponential back for retries. Enabled MDC. Payload is converted.
 Tests are using elasic-mq.
 
 ### Installing
