@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 /**
- * @author <a href="mailto:brynjar.norum@embriq.no">Brynjar Norum</a> 2018-08-17.
+ * @author <a href="mailto:brynjar.norum@progconsult.no">Brynjar Norum</a> 2018-08-17.
  */
 @Component
 public class SqsBackOff {
