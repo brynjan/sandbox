@@ -1,4 +1,4 @@
-package no.progconsult.embriq.quant.flow.external.heartbeat;
+package no.progconsult.flow.external.heartbeat;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

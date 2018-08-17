@@ -1,4 +1,4 @@
-package no.progconsult.embriq.quant.flow.external;
+package no.progconsult.flow.external;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

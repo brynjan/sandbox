@@ -1,8 +1,8 @@
-package no.progconsult.embriq.quant.flow.external.configuration;
+package no.progconsult.flow.external.configuration;
 
-import no.progconsult.embriq.quant.flow.external.validate.FailedValidationResponse;
-import no.progconsult.embriq.quant.flow.external.validate.QuantValidator;
-import no.progconsult.embriq.quant.flow.external.validate.ValidationException;
+import no.progconsult.flow.external.validate.FailedValidationResponse;
+import no.progconsult.flow.external.validate.QuantValidator;
+import no.progconsult.flow.external.validate.ValidationException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;

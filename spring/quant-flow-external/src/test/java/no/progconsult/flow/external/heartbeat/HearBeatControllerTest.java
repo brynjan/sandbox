@@ -1,7 +1,7 @@
-package no.progconsult.embriq.quant.flow.external.heartbeat;
+package no.progconsult.flow.external.heartbeat;
 
 
-import no.progconsult.embriq.quant.flow.external.Application;
+import no.progconsult.flow.external.Application;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;

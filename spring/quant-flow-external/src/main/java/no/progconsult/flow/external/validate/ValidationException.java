@@ -1,4 +1,4 @@
-package no.progconsult.embriq.quant.flow.external.validate;
+package no.progconsult.flow.external.validate;
 
 /**
  * @author bno

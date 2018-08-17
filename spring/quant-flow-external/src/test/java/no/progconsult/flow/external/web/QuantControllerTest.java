@@ -1,6 +1,6 @@
-package no.progconsult.embriq.quant.flow.external.web;
+package no.progconsult.flow.external.web;
 
-import no.progconsult.embriq.quant.flow.external.Application;
+import no.progconsult.flow.external.Application;
 import org.apache.activemq.broker.BrokerService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;

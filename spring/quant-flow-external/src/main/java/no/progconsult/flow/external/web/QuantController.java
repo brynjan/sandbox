@@ -1,6 +1,6 @@
-package no.progconsult.embriq.quant.flow.external.web;
+package no.progconsult.flow.external.web;
 
-import no.progconsult.embriq.quant.flow.external.validate.ValidationException;
+import no.progconsult.flow.external.validate.ValidationException;
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;

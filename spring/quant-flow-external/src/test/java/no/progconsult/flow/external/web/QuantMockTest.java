@@ -1,4 +1,4 @@
-package no.progconsult.embriq.quant.flow.external.web;
+package no.progconsult.flow.external.web;
 
 import org.apache.camel.testng.CamelTestSupport;
 
