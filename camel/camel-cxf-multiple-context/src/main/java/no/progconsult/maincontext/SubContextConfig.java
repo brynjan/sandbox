@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author <a href="mailto:brynjar.norum@embriq.no">Brynjar Norum</a> 2017-11-03.
+ * @author <a href="mailto:brynjar.norum@progconsult.no">Brynjar Norum</a> 2017-11-03.
  */
 @Configuration
 public class SubContextConfig {

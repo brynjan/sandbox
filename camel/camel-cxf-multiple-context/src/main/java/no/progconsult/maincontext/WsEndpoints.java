@@ -1,13 +1,6 @@
 package no.progconsult.maincontext;
 
-import no.embriq.ws.HelloWorld2;
-import no.embriq.ws.HelloWorld2_Service;
-
-import no.progconsult.ws.HelloWorld;
-import no.progconsult.ws.HelloWorld_Service;
 import org.apache.camel.component.cxf.CxfEndpoint;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
@@ -19,16 +12,16 @@ public class WsEndpoints {
 
 //    private static final String ROOT_FOLDER = "SSYSv172";
 //
-    @Bean
-    CxfEndpoint helloEndpoint(Environment environment, @Value("${ws.endpoint.hello.main.uri}") final String uri) {
-        CxfEndpoint helloEndpoint = new CxfEndpoint();
-        helloEndpoint.setAddress(uri);
-        helloEndpoint.setServiceClass(HelloWorld.class);
-        helloEndpoint.setPortName(HelloWorld_Service.HelloWorldImplPort);
-        helloEndpoint.setWsdlURL("classpath:/wsdl/main/hello.wsdl");
-        setCommonProperties(environment, helloEndpoint);
-        return helloEndpoint;
-    }
+//    @Bean
+//    CxfEndpoint helloEndpoint(Environment environment, @Value("${ws.endpoint.hello.main.uri}") final String uri) {
+//        CxfEndpoint helloEndpoint = new CxfEndpoint();
+//        helloEndpoint.setAddress(uri);
+//        helloEndpoint.setServiceClass(HelloWorld.class);
+//        helloEndpoint.setPortName(HelloWorld_Service.HelloWorldImplPort);
+//        helloEndpoint.setWsdlURL("classpath:/wsdl/main/hello.wsdl");
+//        setCommonProperties(environment, helloEndpoint);
+//        return helloEndpoint;
+//    }
 
 
 //    @Bean

@@ -1,18 +1,9 @@
 package no.progconsult.subcontext;
 
-import no.embriq.ws.HelloWorld2;
-import no.embriq.ws.HelloWorld2_Service;
 
-import no.progconsult.ws.HelloWorld;
-import no.progconsult.ws.HelloWorld_Service;
 import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.cxf.Bus;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-
-import static no.progconsult.maincontext.CXFServletFactory.getCxfServlet;
 
 /**
  * Endpoints for IS Customer.
@@ -34,19 +25,19 @@ public class SubWsEndpoints {
 //    }
 
 
-    public static CxfEndpoint hello2Endpoint(Bus bus)  {
-        CxfEndpoint helloEndpoint = new CxfEndpoint();
-//        helloEndpoint.setBus(getCxfServlet().getBus());
-        helloEndpoint.setBus(bus);
-
-        helloEndpoint.setAddress("/adapterId/HelloSub");
-        helloEndpoint.setServiceClass(HelloWorld2.class);
-        helloEndpoint.setPortName(HelloWorld2_Service.HelloWorldImplPort);
-        helloEndpoint.setWsdlURL("classpath:/wsdl/sub/hello2.wsdl");
-//        setCommonProperties(environment, helloEndpoint);
-        return helloEndpoint;
-    }
-
+//    public static CxfEndpoint hello2Endpoint(Bus bus)  {
+//        CxfEndpoint helloEndpoint = new CxfEndpoint();
+////        helloEndpoint.setBus(getCxfServlet().getBus());
+//        helloEndpoint.setBus(bus);
+//
+//        helloEndpoint.setAddress("/adapterId/HelloSub");
+//        helloEndpoint.setServiceClass(HelloWorld2.class);
+//        helloEndpoint.setPortName(HelloWorld2_Service.HelloWorldImplPort);
+//        helloEndpoint.setWsdlURL("classpath:/wsdl/sub/hello2.wsdl");
+////        setCommonProperties(environment, helloEndpoint);
+//        return helloEndpoint;
+//    }
+//
 
 //    @Bean
 //    CxfEndpoint helloSubEndpoint(Environment environment, @Value("${ws.endpoint.hello.sub.uri}") final String uri) {

@@ -2,18 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>no.embriq.quant.flow</groupId>
+    <groupId>no.progconsult.flow</groupId>
     <artifactId>camel-cxf-multiple-context</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>multicontext</name>
     <description>multicontext</description>
-
-    <parent>
-        <groupId>no.embriq</groupId>
-        <artifactId>embriq-parent</artifactId>
-        <version>12</version>
-    </parent>
 
     <properties>
         <spring.version>4.3.9.RELEASE</spring.version>
@@ -32,21 +26,9 @@
         <excluded.test.groups>certification</excluded.test.groups>
     </properties>
 
-    <scm>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/embriq/issuite-adapter-bimplus.git</developerConnection>
-        <tag>issuite-adapter-0.3.1</tag>
-    </scm>
 
     <repositories>
         <!-- needed to fetch parent pom -->
-        <repository>
-            <id>embriq-release</id>
-            <name>Repository for in-house releases</name>
-            <url>s3://maven.lab.embriq.no/embriq-release</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
 
         <!-- org.restlet.ext.spring -->
         <repository>

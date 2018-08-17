@@ -15,7 +15,7 @@ import java.util.Map;
 import static no.progconsult.maincontext.CXFServletFactory.getCxfServlet;
 
 /**
- * @author <a href="mailto:brynjar.norum@embriq.no">Brynjar Norum</a> 2017-11-02.
+ * @author <a href="mailto:brynjar.norum@progconsult.no">Brynjar Norum</a> 2017-11-02.
  */
 public class SubContextCreator {
 
