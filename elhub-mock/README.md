@@ -1,6 +1,5 @@
 # Elhub Polling Service
 
-See https://confluence.embriq.no/display/NET/ElhubPollingService
 
 ## Install and use 
 
@@ -14,8 +13,6 @@ wget -qO- https://get.docker.com/ | sh
 
 ###  Install application 
 ```
-sudo docker pull embriq/elhub-polling-service
-sudo docker run -d -p 8080:8080 --name elhub-polling-service embriq/elhub-polling-service
 ```
 
 ### Test that service is running 
@@ -33,8 +30,6 @@ See https://docs.docker.com/userguide/dockervolumes/#backup-restore-or-migrate-d
 ### Build and run for development
 
 ```
-docker build -t embriq/elhub-polling-service Docker
-docker run -d -p 8080:8080 --name elhub-polling-service embriq/elhub-polling-service
 ```
 
 * To stop and remove ALL containers: 

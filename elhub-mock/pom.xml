@@ -2,18 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.embriq.quant.flow</groupId>
+    <groupId>com.progconsult</groupId>
     <artifactId>elhub-mock</artifactId>
     <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Elhub polling service</name>
     <description>Elhub polling service</description>
 
-    <parent>
-        <groupId>no.embriq.quant.flow</groupId>
-        <artifactId>parentpom</artifactId>
-        <version>5</version>
-    </parent>
 
     <properties>
         <spring.version>4.2.1.RELEASE</spring.version>
@@ -29,37 +24,8 @@
         <excluded.test.groups>cxf-client</excluded.test.groups>
     </properties>
 
-    <scm>
-        <connection>scm:git:http://gitlab.embriq.no/flow/elhub-polling-service.git</connection>
-        <url>https://gitlab.embriq.no/flow/elhub-polling-service</url>
-        <developerConnection>scm:git:ssh://git@gitlab.embriq.no/flow/elhub-polling-service.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-
-    <repositories>
-        <!-- Needed for parent pom, meterpoint-schemas -->
-        <repository>
-            <id>embriq-releases</id>
-            <name>libs-releases</name>
-            <url>http://artifactory.embriq.no:8080/artifactory/libs-release-local</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>embriq-snapshots</id>
-            <name>libs-snapshots</name>
-            <url>http://artifactory.embriq.no:8080/artifactory/libs-snapshot-local</url>
-            <snapshots />
-        </repository>
-    </repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>no.embriq.quant.flow</groupId>
-            <artifactId>elhub-ws-api</artifactId>
-            <version>1.1.1</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-core</artifactId>
@@ -357,7 +323,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>no.embriq.quant.flow.elhub.pollingservice.Application</Main-Class>
+                                        <Main-Class>no.progconsult.flow.elhub.pollingservice.Application</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
