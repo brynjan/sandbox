@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>no.progconsult.lambda</groupId>
+    <artifactId>lambda-example1</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>lambda-example1</name>
+
+    <parent>
+        <groupId>no.embriq</groupId>
+        <artifactId>embriq-parent</artifactId>
+        <version>12</version>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <spring.framework.boot.version>2.0.4.RELEASE</spring.framework.boot.version>
+        <spring.framework.core.version>5.0.8.RELEASE</spring.framework.core.version>
+        <spring-cloud.version>Finchley.SR1</spring-cloud.version>
+
+        <cxf.version>3.2.5</cxf.version>
+        <amazon-sqs-java-messaging-lib.version>1.0.4</amazon-sqs-java-messaging-lib.version>
+        <jackson.version>2.9.6</jackson.version>
+
+
+        <testng.version>6.9.10</testng.version>
+    </properties>
+
+    <scm>
+        <developerConnection>scm:git:ssh://git@bitbucket.org/embriq/visma-agent.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <repositories>
+        <!-- needed to fetch parent pom -->
+        <repository>
+            <id>embriq-release</id>
+            <name>Repository for in-house releases</name>
+            <url>s3://maven.lab.embriq.no/embriq-release</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+
+    <dependencies>
+
+        <!-- QF dependencies -->
+        <dependency>
+            <groupId>no.embriq.quant.flow</groupId>
+            <artifactId>quant-flow-typelib</artifactId>
+            <version>2.0.144</version>
+        </dependency>
+        <dependency>
+            <groupId>no.embriq.aws</groupId>
+            <artifactId>aws-util-auth</artifactId>
+            <version>0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>no.embriq.aws</groupId>
+            <artifactId>aws-util-sqs</artifactId>
+            <version>0.14</version>
+        </dependency>
+        <dependency>
+            <groupId>no.embriq.aws</groupId>
+            <artifactId>aws-util-ssm</artifactId>
+            <version>0.6</version>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-core</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
+        <!-- Util -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>2.18.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>no.embriq.quant.flow</groupId>
+            <artifactId>quant-flow-test-util</artifactId>
+            <version>1.0.20</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-frontend-simple</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.framework.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
