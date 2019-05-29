@@ -1,5 +1,8 @@
 package no.progconsult.aws.lambda;
 
+import no.embriq.aws.util.sqs.AmazonGlobal;
+import no.embriq.aws.util.sqs.AmazonKMSSQSClient;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.SQSEvent;
@@ -9,10 +12,23 @@ import com.amazonaws.services.lambda.runtime.events.SQSEvent;
  */
 public class SqsLambda implements RequestHandler<SQSEvent, Void> {
 
+
+    private String kms = "alias/embriq-flow";
+    private String bucket = "embriq-flow.eu-west-1.965281606204";
+    AmazonKMSSQSClient amazonKMSSQSClient;
+
+    public SqsLambda() {
+        amazonKMSSQSClient = new AmazonKMSSQSClient(AmazonGlobal.DEFAULT_REGION, kms, bucket);
+    }
+
     @Override
     public Void handleRequest(SQSEvent sqsEvent, Context context) {
+        int i = 1;
         for (SQSEvent.SQSMessage msg : sqsEvent.getRecords()) {
-            System.out.println(msg.getBody());
+
+            amazonKMSSQSClient.inflate(msg);
+
+            System.out.println("message number: " + i++ + "body: " + msg.getBody());
         }
         return null;
     }

@@ -64,7 +64,7 @@
         <dependency>
             <groupId>no.embriq.aws</groupId>
             <artifactId>aws-util-sqs</artifactId>
-            <version>0.14</version>
+            <version>0.16-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>no.embriq.aws</groupId>

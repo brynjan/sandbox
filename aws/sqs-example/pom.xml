@@ -102,6 +102,13 @@
             <version>${jackson.version}</version>
         </dependency>
 
+        <!-- aws -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sts</artifactId>
+            <version>1.11.336</version>
+        </dependency>
+
 
         <!-- Util -->
         <dependency>
