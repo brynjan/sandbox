@@ -91,12 +91,21 @@
             <version>2.2.6</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.symphonia</groupId>
+            <artifactId>lambda-logging</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+
+
         <!-- Util -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.4</version>
         </dependency>
+
+
 
         <!-- Test -->
         <dependency>

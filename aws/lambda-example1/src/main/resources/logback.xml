@@ -1,5 +1,21 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+
+    <appender name="STDOUT" class="io.symphonia.lambda.logging.DefaultConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%thread] %-5level %logger{35} %X{breadcrumbId} - %msg%n</pattern>
+
+<!--            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %X{AWSRequestId:-" + NO_REQUEST_ID + "} %.-6level %logger{5} - %msg \r%replace(%ex){'\n','\r'}%nopex%n</pattern>-->
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>
+
+<!--configuration>
     <property name="logDir" value="logs/"/>
     <property name="appName" value="vismaagent"/>
 
@@ -47,4 +63,4 @@
     <root level="INFO">
         <appender-ref ref="logfile"/>
     </root>
-</configuration>
+</configuration-->
