@@ -33,27 +33,37 @@ public class SqsLambda implements RequestHandler<SQSEvent, Void> {
     public SqsLambda() {
         amazonKMSSQSClient = new AmazonKMSSQSClient(AmazonGlobal.DEFAULT_REGION, kms, bucket);
         queueUrl = amazonKMSSQSClient.getQueueUrl("lamba-test-bno").getQueueUrl();
+        try {
+            System.out.println("starting sleep");
+            Thread.sleep(4000);
+            System.out.println("ending sleep");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public Void handleRequest(SQSEvent sqsEvent, Context context) {
         int i = 1;
         LOG.info("number of messages: {}", sqsEvent.getRecords().size());
+
+        System.out.println("context: " + context.getClass().getName());
         for (SQSEvent.SQSMessage msg : sqsEvent.getRecords()) {
 
-            i++;
-            amazonKMSSQSClient.inflate(msg);
-
-            LOG.info("process message body: " + msg.getBody());
-
-            if (i > 2) {
-                LOG.info("failed message body: " + msg.getBody());
-                extendMessageVisibilityTimeout(msg);
-                throw new RuntimeException("feilet");
-            } else {
-                amazonKMSSQSClient.deleteMessage(queueUrl, msg.getReceiptHandle());
-                LOG.info("Deleted message: {}", msg.getBody());
-            }
+            System.out.println("body: " + msg.getBody());
+//            i++;
+//            amazonKMSSQSClient.inflate(msg);
+//
+//            LOG.info("process message body: " + msg.getBody());
+//
+//            if (i > 2) {
+//                LOG.info("failed message body: " + msg.getBody());
+//                extendMessageVisibilityTimeout(msg);
+//                throw new RuntimeException("feilet");
+//            } else {
+//                amazonKMSSQSClient.deleteMessage(queueUrl, msg.getReceiptHandle());
+//                LOG.info("Deleted message: {}", msg.getBody());
+//            }
         }
         return null;
     }
