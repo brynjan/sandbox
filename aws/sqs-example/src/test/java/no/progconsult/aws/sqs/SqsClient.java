@@ -14,27 +14,6 @@ import org.testng.annotations.Test;
  */
 public class SqsClient {
 
-    @Test
-    public void testName() {
-
-        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                                                 .withRegion(Regions.EU_WEST_1)
-                                                 .build();
-
-
-        s3Client.listBuckets().stream().forEach(bucket -> System.out.println("bucket1: " + bucket.getName()));
-        System.out.println();
-
-
-
-        final ProfileCredentialsProvider credentialsProvider
-                = new ProfileCredentialsProvider("bno");
-        s3Client = AmazonS3ClientBuilder.standard().withCredentials(credentialsProvider).build();
-
-        s3Client.listBuckets().stream().forEach(bucket -> System.out.println("bucket2: " + bucket.getName()));
-        System.out.println();
-
-    }
 
     @Test
     public void send() throws Exception{
