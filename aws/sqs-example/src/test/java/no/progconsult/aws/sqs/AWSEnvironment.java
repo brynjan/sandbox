@@ -5,6 +5,7 @@ package no.progconsult.aws.sqs;
  */
 public enum AWSEnvironment {
 
+    LAB("alias/embriq-flow", "embriq-flow.eu-west-1.965281606204", "embriq_admin_lab"),
     SYSTEST("alias/embriq-flow", "embriq-flow.eu-west-1.410767370853", "embriq_developer_test");
 
     private final String cmk;

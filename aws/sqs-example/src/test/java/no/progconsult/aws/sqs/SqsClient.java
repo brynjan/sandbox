@@ -15,7 +15,7 @@ import org.testng.annotations.Test;
 public class SqsClient {
 
 
-    @Test
+    @Test(enabled = false)
     public void send() throws Exception{
 
         AmazonSQS amazonSQS = AmazonSQSClientBuilder.standard()
@@ -38,7 +38,7 @@ public class SqsClient {
 
 
 
-    @Test
+    @Test(enabled = false)
     public void sendtoLambda() throws Exception{
 
         AmazonSQS amazonSQS = AmazonSQSClientBuilder.standard()
