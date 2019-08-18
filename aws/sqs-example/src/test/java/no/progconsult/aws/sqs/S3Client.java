@@ -5,6 +5,7 @@ import no.embriq.aws.util.sqs.AmazonKMS;
 import no.embriq.aws.util.sqs.Global;
 
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kms.AWSKMS;
 import com.amazonaws.services.kms.AWSKMSClient;
@@ -16,6 +17,11 @@ import com.amazonaws.services.kms.model.GenerateDataKeyResult;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.AmazonS3Encryption;
+import com.amazonaws.services.s3.AmazonS3EncryptionClientBuilder;
+import com.amazonaws.services.s3.model.CryptoConfiguration;
+import com.amazonaws.services.s3.model.CryptoMode;
+import com.amazonaws.services.s3.model.KMSEncryptionMaterialsProvider;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.util.Base64;
@@ -88,7 +94,6 @@ public class S3Client {
         String encryptedPayload = encrypt(kms, cmk, payload);
 
         String key = UUID.randomUUID().toString();
-
 
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -180,6 +185,173 @@ public class S3Client {
         System.out.println(
 
         );
+    }
+
+    @Test
+    public void testEncryptionOnly_KmsManagedKey() {
+
+        AWSEnvironment environment = AWSEnvironment.LAB;
+
+        String cmk = environment.getCmk();
+        String bucket = environment.getBucket();
+
+        MFACredentialsProvider awsCredentialsProvider = new MFACredentialsProvider(environment.getProfile());
+
+//        AmazonS3 s3 = AmazonS3Client.builder().withCredentials(awsCredentialsProvider).withRegion(Regions.EU_WEST_1).build();
+
+        AmazonS3Encryption s3Encryption = AmazonS3EncryptionClientBuilder
+                .standard()
+                .withCredentials(awsCredentialsProvider)
+                .withRegion(Regions.EU_WEST_1)
+                .withCryptoConfiguration(new CryptoConfiguration(CryptoMode.EncryptionOnly).withAwsKmsRegion(Region.getRegion(Regions.EU_WEST_1)))
+                // Can either be Key ID or alias (prefixed with 'alias/')
+                .withEncryptionMaterials(new KMSEncryptionMaterialsProvider(cmk))
+                .build();
+
+//        AmazonS3 s3NonEncrypt = AmazonS3ClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).build();
+
+        String ENCRYPTED_KEY = "enc-key";
+        String NON_ENCRYPTED_KEY = "some-key";
+
+        PutObjectResult putObjectResult = s3Encryption.putObject(bucket, ENCRYPTED_KEY, "some contents");
+
+
+        System.out.println();
+//        s3NonEncrypt.putObject(bucket, NON_ENCRYPTED_KEY, "some other contents");
+
+
+    }
+
+    @Test
+    public void testDecryptionOnly_KmsManagedKey() {
+
+        AWSEnvironment environment = AWSEnvironment.LAB;
+
+        String cmk = environment.getCmk();
+        String bucket = environment.getBucket();
+
+        MFACredentialsProvider awsCredentialsProvider = new MFACredentialsProvider(environment.getProfile());
+
+//        AmazonS3 s3 = AmazonS3Client.builder().withCredentials(awsCredentialsProvider).withRegion(Regions.EU_WEST_1).build();
+
+        AmazonS3Encryption s3Encryption = AmazonS3EncryptionClientBuilder
+                .standard()
+                .withCredentials(awsCredentialsProvider)
+                .withRegion(Regions.EU_WEST_1)
+                .withCryptoConfiguration(new CryptoConfiguration(CryptoMode.EncryptionOnly).withAwsKmsRegion(Region.getRegion(Regions.EU_WEST_1)))
+                // Can either be Key ID or alias (prefixed with 'alias/')
+                .withEncryptionMaterials(new KMSEncryptionMaterialsProvider(cmk))
+                .build();
+
+//        AmazonS3 s3NonEncrypt = AmazonS3ClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).build();
+
+        String ENCRYPTED_KEY = "enc-key";
+//        String NON_ENCRYPTED_KEY = "some-key";
+
+//        PutObjectResult putObjectResult = s3Encryption.putObject(bucket, ENCRYPTED_KEY, "some contents");
+
+        System.out.println(s3Encryption.getObjectAsString(bucket, ENCRYPTED_KEY));
+
+
+        System.out.println();
+//        s3NonEncrypt.putObject(bucket, NON_ENCRYPTED_KEY, "some other contents");
+    }
+
+    @Test
+    public void testAuthenticatedEncryptiony_KmsManagedKey() {
+
+        AWSEnvironment environment = AWSEnvironment.LAB;
+
+        String cmk = environment.getCmk();
+        String bucket = environment.getBucket();
+
+        MFACredentialsProvider awsCredentialsProvider = new MFACredentialsProvider(environment.getProfile());
+
+//        AmazonS3 s3 = AmazonS3Client.builder().withCredentials(awsCredentialsProvider).withRegion(Regions.EU_WEST_1).build();
+
+//        AmazonS3Encryption s3Encryption = AmazonS3EncryptionClientBuilder
+//                .standard()
+//                .withCredentials(awsCredentialsProvider)
+//                .withRegion(Regions.EU_WEST_1)
+//                .withCryptoConfiguration(new CryptoConfiguration(CryptoMode.EncryptionOnly).withAwsKmsRegion(Region.getRegion(Regions.EU_WEST_1)))
+//                // Can either be Key ID or alias (prefixed with 'alias/')
+//                .withEncryptionMaterials(new KMSEncryptionMaterialsProvider(cmk))
+//                .build();
+
+
+        AmazonS3Encryption s3Encryption = AmazonS3EncryptionClientBuilder
+                .standard()
+                .withCredentials(awsCredentialsProvider)
+                .withRegion(Regions.EU_WEST_1)
+                .withCryptoConfiguration(new CryptoConfiguration(CryptoMode.AuthenticatedEncryption).withAwsKmsRegion(Region.getRegion(Regions.EU_WEST_1)))
+                // Can either be Key ID or alias (prefixed with 'alias/')
+                .withEncryptionMaterials(new KMSEncryptionMaterialsProvider(cmk))
+                .build();
+
+//        AmazonS3 s3NonEncrypt = AmazonS3ClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).build();
+
+        String ENCRYPTED_KEY = "enc-key";
+        String NON_ENCRYPTED_KEY = "some-key";
+
+//        String NON_ENCRYPTED_KEY = "some-key";
+        AmazonS3 s3NonEncrypt = AmazonS3ClientBuilder.standard().withCredentials(awsCredentialsProvider)
+                                                     .withRegion(Regions.EU_WEST_1).build();
+
+        PutObjectResult putObjectResult = s3Encryption.putObject(bucket, ENCRYPTED_KEY, "some contents");
+        s3NonEncrypt.putObject(bucket, NON_ENCRYPTED_KEY, "some other contents");
+
+        System.out.println();
+
+        System.out.println(s3Encryption.getObjectAsString(bucket, ENCRYPTED_KEY));
+        System.out.println(s3Encryption.getObjectAsString(bucket, NON_ENCRYPTED_KEY));
+
+        System.out.println();
+//        s3NonEncrypt.putObject(bucket, NON_ENCRYPTED_KEY, "some other contents");
+    }
+
+
+    @Test
+    public void testAuthenticatedDeCryptiony_KmsManagedKey() {
+
+        AWSEnvironment environment = AWSEnvironment.LAB;
+
+        String cmk = environment.getCmk();
+        String bucket = environment.getBucket();
+
+        MFACredentialsProvider awsCredentialsProvider = new MFACredentialsProvider(environment.getProfile());
+
+//        AmazonS3 s3 = AmazonS3Client.builder().withCredentials(awsCredentialsProvider).withRegion(Regions.EU_WEST_1).build();
+
+//        AmazonS3Encryption s3Encryption = AmazonS3EncryptionClientBuilder
+//                .standard()
+//                .withCredentials(awsCredentialsProvider)
+//                .withRegion(Regions.EU_WEST_1)
+//                .withCryptoConfiguration(new CryptoConfiguration(CryptoMode.EncryptionOnly).withAwsKmsRegion(Region.getRegion(Regions.EU_WEST_1)))
+//                // Can either be Key ID or alias (prefixed with 'alias/')
+//                .withEncryptionMaterials(new KMSEncryptionMaterialsProvider(cmk))
+//                .build();
+
+
+        AmazonS3Encryption s3Encryption = AmazonS3EncryptionClientBuilder
+                .standard()
+                .withCredentials(awsCredentialsProvider)
+                .withRegion(Regions.EU_WEST_1)
+                .withCryptoConfiguration(new CryptoConfiguration(CryptoMode.AuthenticatedEncryption).withAwsKmsRegion(Region.getRegion(Regions.EU_WEST_1)))
+                // Can either be Key ID or alias (prefixed with 'alias/')
+                .withEncryptionMaterials(new KMSEncryptionMaterialsProvider(cmk))
+                .build();
+
+//        AmazonS3 s3NonEncrypt = AmazonS3ClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).build();
+
+        String ENCRYPTED_KEY = "enc-key";
+        String NON_ENCRYPTED_KEY = "some-key";
+
+        System.out.println(s3Encryption.getObjectAsString(bucket, ENCRYPTED_KEY));
+        System.out.println(s3Encryption.getObjectAsString(bucket, NON_ENCRYPTED_KEY));
+
+
+        System.out.println();
+//        s3NonEncrypt.putObject(bucket, NON_ENCRYPTED_KEY, "some other contents");
     }
 
     public static String decrypt(AWSKMS kms, String payload) {
