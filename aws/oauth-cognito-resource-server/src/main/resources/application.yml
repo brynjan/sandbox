@@ -1,0 +1,17 @@
+server:
+  port: 9090
+
+#spring:
+#  security:
+#    oauth2:
+#      resourceserver:
+#        opaquetoken:
+#          introspection-uri: https://api-product-bno.auth.eu-west-1.amazoncognito.com/oauth2/authorize
+#          client-id: 18uni31g0jmhmge96qciu0b1oh
+#          client-secret: ve69u5a6qg1sdaltm62qc8nuufmfi9hap86kigmtccmhg437ish
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_ysDOPqu3H/.well-known/jwks.json
