@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<extensions>
+    <!-- Needed for S3 wagon. -->
+    <extension>
+        <groupId>com.github.nodely</groupId>
+        <artifactId>maven-s3-wagon</artifactId>
+        <version>1.0.0</version>
+    </extension>
+</extensions>
