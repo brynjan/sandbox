@@ -4,12 +4,9 @@ import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import io.awspring.cloud.messaging.listener.SimpleMessageListenerContainer;
-import no.progconsult.springbootsqs.config.TestConfig;
-import no.embriq.quant.flow.pubsub.sdk.Publisher;
-import no.embriq.quant.flow.pubsub.sdk.Receiver;
 import no.embriq.quant.flow.test.sqs.SqsAsyncClientMock;
 import no.embriq.quant.flow.test.sqs.SqsServerMock;
+import no.progconsult.springbootsqs.config.TestConfig;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,20 +51,20 @@ public abstract class AbstractSystemTest extends AbstractTestNGSpringContextTest
     @Autowired
     protected TestRestTemplate restTemplate;
 
-    @Autowired
-    protected Receiver receiverMock;
+//    @Autowired
+//    protected Receiver receiverMock;
 
     @LocalServerPort
     protected int port;
 
-    @Autowired
-    protected SimpleMessageListenerContainer simpleMessageListenerContainer;
+//    @Autowired
+//    protected SimpleMessageListenerContainer simpleMessageListenerContainer;
 
     @Autowired
     protected Environment environment;
 
-    @Autowired
-    protected Publisher publisherMock;
+//    @Autowired
+//    protected Publisher publisherMock;
 
     @BeforeSuite
     public void setupSuite() {
@@ -80,14 +77,14 @@ public abstract class AbstractSystemTest extends AbstractTestNGSpringContextTest
     @AfterClass
     public void shutdownAgent() {
         //Stopping the container in order to avoid nasty stacktrace.
-        simpleMessageListenerContainer.stop();
+//        simpleMessageListenerContainer.stop();
     }
 
     @BeforeMethod
     public void resetMocks() {
         sqsClientMock.clearState();
         wireMockServer.resetAll();
-        reset(publisherMock);
+//        reset(publisherMock);
     }
 
 

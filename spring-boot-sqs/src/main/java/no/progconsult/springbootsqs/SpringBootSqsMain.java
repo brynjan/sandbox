@@ -1,11 +1,7 @@
 package no.progconsult.springbootsqs;
 
-import io.awspring.cloud.autoconfigure.context.ContextCredentialsAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
-import io.awspring.cloud.autoconfigure.context.ContextStackAutoConfiguration;
 import org.slf4j.Logger;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 })
 @Configuration
 @ComponentScan
-@EnableAutoConfiguration(exclude = {ContextStackAutoConfiguration.class, ContextCredentialsAutoConfiguration.class, ContextResourceLoaderAutoConfiguration.class})
+//@EnableAutoConfiguration(exclude = {ContextStackAutoConfiguration.class, ContextCredentialsAutoConfiguration.class, ContextResourceLoaderAutoConfiguration.class})
 public class SpringBootSqsMain {
 
     private static final Logger LOG = getLogger(SpringBootSqsMain.class);
