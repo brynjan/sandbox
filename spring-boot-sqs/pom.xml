@@ -57,15 +57,15 @@
             <artifactId>quant-flow-typelib</artifactId>
             <version>4.0.236</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>no.embriq.quant.flow</groupId>-->
-<!--            <artifactId>flow-aws-auth</artifactId>-->
-<!--            <version>1.0.1</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>no.embriq.quant.flow</groupId>
             <artifactId>quant-flow-common</artifactId>
             <version>0.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>no.embriq.quant.flow</groupId>
+            <artifactId>flow-aws-auth</artifactId>
+            <version>1.0.3</version>
         </dependency>
 
 

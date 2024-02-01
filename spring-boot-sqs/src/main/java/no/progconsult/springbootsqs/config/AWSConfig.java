@@ -1,22 +1,40 @@
 package no.progconsult.springbootsqs.config;
 
+import no.embriq.flow.aws.auth.AmazonCredentialsProvider;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
 
 @Configuration
 public class AWSConfig {
 
 
-//    @Bean
-//    SqsAsyncClient sqsAsyncClient(){
-//        return SqsAsyncClient
-//                .builder()
-//                .region(Region.of(region))
-//                .credentialsProvider(StaticCredentialsProvider
-//                        .create(AwsBasicCredentials.create(accessKey, secretKey)))
-//                .build();
-//        // add more Options
-//    }
+    @Bean
+    AwsCredentialsProvider awsCredentialsProvider(Environment env) {
+        return new AmazonCredentialsProvider(env.getRequiredProperty("cognito.credentials.provider.awsAccountId"),
+                Region.of(env.getRequiredProperty("cognito.credentials.provider.awsRegion")),
+                env.getRequiredProperty("cognito.credentials.provider.identityPoolId"),
+                env.getRequiredProperty("cognito.credentials.provider.userPoolId"),
+                env.getRequiredProperty("cognito.credentials.provider.userPoolApplicationId"),
+                env.getRequiredProperty("cognito.credentials.provider.username"),
+                env.getRequiredProperty("cognito.credentials.provider.password"));
+    }
+
+
+    @Bean
+    SqsAsyncClient sqsAsyncClient(AwsCredentialsProvider awsCredentialsProvider, Environment env){
+        SqsAsyncClient sqsAsyncClient = SqsAsyncClient
+                .builder()
+                .region(Region.of(env.getRequiredProperty("cognito.credentials.provider.awsRegion")))
+                .credentialsProvider(awsCredentialsProvider)
+                .build();
+        return sqsAsyncClient;
+        // add more Options
+    }
 
 //    @Bean
 //    AWSCredentialsProvider awsCredentialsProvider(Environment env) {

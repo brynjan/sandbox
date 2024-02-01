@@ -1,5 +1,6 @@
 package no.progconsult.springbootsqs.config;
 
+import io.awspring.cloud.sqs.annotation.SqsListener;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,13 @@ public class MessageConsumer {
         this.springBootSqsRoute = springBootSqsRoute;
         this.sqsBackOff = sqsBackOff;
     }
+
+    @SqsListener("embriq-volueagent-in-more")
+    public void receiveMessage(String message) {
+        // Process the received message
+        System.out.println("Received message: " + message);
+    }
+
 
 //    @SqsListener(value = "${sqs.quant.meterreading.deliveries.subcription.in}", deletionPolicy = SqsMessageDeletionPolicy.NEVER)
 //    public void receiveEventFromHes(Acknowledgment acknowledgment, FlowTopicEvent flowTopicEvent) {
