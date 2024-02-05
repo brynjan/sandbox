@@ -1,12 +1,26 @@
 package no.progconsult.springbootsqs.config;
 
+import com.amazon.sqs.javamessaging.ProviderConfiguration;
+import com.amazon.sqs.javamessaging.SQSConnectionFactory;
+import com.amazon.sqs.javamessaging.SQSSession;
+import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.Session;
 import no.embriq.flow.aws.auth.AmazonCredentialsProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.config.JmsListenerContainerFactory;
+import org.springframework.jms.support.destination.DestinationResolver;
+import org.springframework.jms.support.destination.DynamicDestinationResolver;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.core.retry.RetryMode;
+import software.amazon.awssdk.core.retry.RetryPolicy;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
 
 @Configuration
@@ -25,6 +39,48 @@ public class AWSConfig {
     }
 
 
+//    @Bean
+//    SqsClient sqsClient(AwsCredentialsProvider awsCredentialsProvider, Environment env) {
+//
+//        SqsClient sqsClient = SqsClient.builder()
+//                .region(Region.of(env.getRequiredProperty("cognito.credentials.provider.awsRegion")))
+//                .credentialsProvider(awsCredentialsProvider)
+//                .build();
+//
+//
+//        return sqsClient;
+//    }
+
+
+//    @Bean
+//    public ConnectionFactory connectionFactory(SqsClient sqsClient){
+//        ProviderConfiguration providerConfiguration = new ProviderConfiguration();
+//
+//        SQSConnectionFactory sqsConnectionFactory = new SQSConnectionFactory(providerConfiguration, sqsClient);
+//        return sqsConnectionFactory;
+//    }
+
+//    @Bean
+//    public DestinationResolver destinationResolver() {
+//        return new StaticDestinationResolver("embriq-volueagent-in-more");
+//    }
+
+//    @Bean
+//    public JmsListenerContainerFactory<?> jmsListenerContainerFactory(
+//            ConnectionFactory connectionFactory) {
+//
+//        DefaultJmsListenerContainerFactory jmsListenerContainerFactory =
+//                new DefaultJmsListenerContainerFactory();
+//        jmsListenerContainerFactory.setConnectionFactory(connectionFactory);
+//        jmsListenerContainerFactory.setDestinationResolver(new DynamicDestinationResolver());
+////        jmsListenerContainerFactory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
+//        jmsListenerContainerFactory.setSessionAcknowledgeMode(SQSSession.UNORDERED_ACKNOWLEDGE);
+//        jmsListenerContainerFactory.setSessionTransacted(false);
+//
+//        return jmsListenerContainerFactory;
+//    }
+
+
     @Bean
     SqsAsyncClient sqsAsyncClient(AwsCredentialsProvider awsCredentialsProvider, Environment env){
         SqsAsyncClient sqsAsyncClient = SqsAsyncClient
@@ -36,28 +92,19 @@ public class AWSConfig {
         // add more Options
     }
 
-//    @Bean
-//    AWSCredentialsProvider awsCredentialsProvider(Environment env) {
-//        return new AmazonCredentialsProvider(env.getRequiredProperty("cognito.credentials.provider.awsAccountId"),
-//                Regions.fromName(env.getRequiredProperty("cognito.credentials.provider.awsRegion")),
-//                env.getRequiredProperty("cognito.credentials.provider.identityPoolId"),
-//                env.getRequiredProperty("cognito.credentials.provider.userPoolId"),
-//                env.getRequiredProperty("cognito.credentials.provider.userPoolApplicationId"),
-//                env.getRequiredProperty("cognito.credentials.provider.username"),
-//                env.getRequiredProperty("cognito.credentials.provider.password"));
-//    }
 
+    @Bean
+    SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient) {
+        return SqsMessageListenerContainerFactory
+                .builder()
+//                .configure(options -> options
+//                        .messagesPerPoll(5)
+//                        .pollTimeout(Duration.ofSeconds(10)))
+                .configure(options -> options.maxMessagesPerPoll(1))
 
-//    @Bean
-//    SqsAsyncClient sqsAsyncClient(){
-//        return SqsAsyncClient
-//                .builder()
-//                .region(Region.of(region))
-//                .credentialsProvider(StaticCredentialsProvider
-//                        .create(AwsBasicCredentials.create(accessKey, secretKey)))
-//                .build();
-//        // add more Options
-//    }
+                .sqsAsyncClient(sqsAsyncClient)
+                .build();
+    }
 
 
     //Note! Bean name must match with SqsClientConfiguration@ConditionalOnMissingAmazonClient(AmazonSQS.class)
