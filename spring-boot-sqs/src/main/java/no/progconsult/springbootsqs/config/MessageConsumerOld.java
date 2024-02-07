@@ -19,8 +19,8 @@ public class MessageConsumerOld {
         this.sqsBackOff = sqsBackOff;
     }
 
-    @SqsListener("embriq-volueagent-in-more")
-    public void receiveMessage(String message) {
+    @SqsListener(value = "embriq-volueagent-in-more", factory = "volueSqsListenerContainerFactory")
+    public void receiveVolueMore(String message) {
         // Process the received message
         System.out.println("Received message: " + message);
     }

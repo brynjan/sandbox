@@ -8,6 +8,7 @@
     <logger name="com.amazonaws.latency" level="WARN"/>
     <logger name="com.amazonaws.metrics.internal.cloudwatch.PredefinedMetricTransformer" level="ERROR"/>
     <logger name="no.embriq" level="DEBUG"/>
+    <logger name="io.awspring.cloud" level="DEBUG"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

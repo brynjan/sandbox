@@ -1,26 +1,13 @@
 package no.progconsult.springbootsqs.config;
 
-import com.amazon.sqs.javamessaging.ProviderConfiguration;
-import com.amazon.sqs.javamessaging.SQSConnectionFactory;
-import com.amazon.sqs.javamessaging.SQSSession;
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
-import jakarta.jms.ConnectionFactory;
-import jakarta.jms.Session;
 import no.embriq.flow.aws.auth.AmazonCredentialsProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
-import org.springframework.jms.config.JmsListenerContainerFactory;
-import org.springframework.jms.support.destination.DestinationResolver;
-import org.springframework.jms.support.destination.DynamicDestinationResolver;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
-import software.amazon.awssdk.core.retry.RetryMode;
-import software.amazon.awssdk.core.retry.RetryPolicy;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
-import software.amazon.awssdk.services.sqs.SqsClient;
 
 
 @Configuration
@@ -106,6 +93,31 @@ public class AWSConfig {
                 .build();
     }
 
+
+
+    @Bean
+    SqsMessageListenerContainerFactory<Object> volueSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient) {
+        return SqsMessageListenerContainerFactory
+                .builder()
+//                .configure(options -> options
+//                        .messagesPerPoll(5)
+//                        .pollTimeout(Duration.ofSeconds(10)))
+                .configure(options -> options.maxMessagesPerPoll(1))
+                .messageInterceptor(new KMSMessageInterceptor())
+                .sqsAsyncClient(sqsAsyncClient)
+                .build();
+    }
+
+
+//    @Bean
+//    MessageListenerContainer<Object> myListenerContainer(SqsAsyncClient sqsAsyncClient) {
+//        return SqsMessageListenerContainerFactory
+//                .builder()
+//                .sqsAsyncClient(sqsAsyncClient)
+//                .messageListener(System.out::println)
+//                .build()
+//                .createContainer("myQueue");
+//    }
 
     //Note! Bean name must match with SqsClientConfiguration@ConditionalOnMissingAmazonClient(AmazonSQS.class)
 //    @Bean
