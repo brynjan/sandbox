@@ -1,6 +1,8 @@
 package no.progconsult.springbootsqs.config;
 
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
+import io.awspring.cloud.sqs.listener.SqsContainerOptions;
+import io.awspring.cloud.sqs.support.converter.SqsMessagingMessageConverter;
 import no.embriq.flow.aws.auth.AmazonCredentialsProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -79,32 +81,43 @@ public class AWSConfig {
         // add more Options
     }
 
+    @Bean
+    SqsKMSClient sqsKMSClient(AwsCredentialsProvider awsCredentialsProvider, Environment env){
+        return new SqsKMSClient(awsCredentialsProvider, Region.of("eu-west-1"));
+    }
+
+    @Bean
+    KMSMessageInterceptor kmsMessageInterceptor(SqsKMSClient sqsKMSClient){
+        return new KMSMessageInterceptor(sqsKMSClient);
+    }
+
 
     @Bean
     SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient) {
+        SqsContainerOptions build = SqsContainerOptions.builder().messageConverter(new SqsMessagingMessageConverter()).build();
         return SqsMessageListenerContainerFactory
                 .builder()
 //                .configure(options -> options
 //                        .messagesPerPoll(5)
 //                        .pollTimeout(Duration.ofSeconds(10)))
                 .configure(options -> options.maxMessagesPerPoll(1))
+//                .containerComponentFactories(build)
 
                 .sqsAsyncClient(sqsAsyncClient)
                 .build();
     }
 
-
-
     @Bean
-    SqsMessageListenerContainerFactory<Object> volueSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient) {
+    SqsMessageListenerContainerFactory<Object> volueSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, KMSMessageInterceptor kmsMessageInterceptor) {
         return SqsMessageListenerContainerFactory
                 .builder()
 //                .configure(options -> options
 //                        .messagesPerPoll(5)
 //                        .pollTimeout(Duration.ofSeconds(10)))
                 .configure(options -> options.maxMessagesPerPoll(1))
-                .messageInterceptor(new KMSMessageInterceptor())
+                .messageInterceptor(kmsMessageInterceptor)
                 .sqsAsyncClient(sqsAsyncClient)
+
                 .build();
     }
 

@@ -12,11 +12,18 @@ public class KMSMessageInterceptor implements MessageInterceptor<Object> {
 
     private transient static final Logger LOG = LoggerFactory.getLogger(KMSMessageInterceptor.class);
 
+    private final SqsKMSClient sqsKMSClient;
+
+    public KMSMessageInterceptor(SqsKMSClient sqsKMSClient) {
+        this.sqsKMSClient = sqsKMSClient;
+    }
+
     @Override
     public Message<Object> intercept(Message<Object> message) {
         LOG.info("Inside interceptor");
 
 
+//        sqsKMSClient.inflate();
 
         return MessageInterceptor.super.intercept(message);
     }
