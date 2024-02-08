@@ -1,9 +1,5 @@
 package no.progconsult.springbootsqs.config;
 
-import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.MessageAttributeValue;
-import com.amazonaws.util.IOUtils;
-import no.embriq.flow.aws.sqs.util.Global;
 import no.embriq.flow.aws.sqs.util.JsonUtil;
 import no.embriq.flow.aws.sqs.v2.AmazonKMS;
 import org.springframework.util.StreamUtils;
@@ -14,6 +10,8 @@ import software.amazon.awssdk.services.kms.KmsClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.sqs.model.Message;
+import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -42,28 +40,32 @@ public class SqsKMSClient {
     }
 
 
-    public void inflate(Message message) {
-        if (message.getMessageAttributes().get(AWS_SQS_LARGE_PAYLOAD) != null) {
-            Map<Object, Object> map = JsonUtil.jsonToMap(message.getMessageAttributes().get(AWS_SQS_LARGE_PAYLOAD).getStringValue());
+    public Message inflate(Message message) {
 
+        if (message.messageAttributes().get(AWS_SQS_LARGE_PAYLOAD) != null) {
+            Map<Object, Object> map = JsonUtil.jsonToMap(message.messageAttributes().get(AWS_SQS_LARGE_PAYLOAD).stringValue());
+
+            final String body;
             if (map.containsKey(IDENTIFIER)) {
-                message.setBody(AmazonKMS.decrypt(kmsClient, read(map.get(BUCKET).toString(), map.get(IDENTIFIER).toString())));
+                body = AmazonKMS.decrypt(kmsClient, read(map.get(BUCKET).toString(), map.get(IDENTIFIER).toString()));
             } else {
-                message.setBody(AmazonKMS.decrypt(kmsClient, message.getBody()));
+                body = AmazonKMS.decrypt(kmsClient, message.body());
             }
 
-            cleanMessageAttributes(message);
+            Map<String, MessageAttributeValue> cleanedMessageAttributes = cleanedMessageAttributes(message);
+            message = message.copy(builder -> builder.body(body).messageAttributes(cleanedMessageAttributes));
         } else {
-            Map<Object, Object> map = JsonUtil.jsonToMap(message.getBody());
+            Map<Object, Object> map = JsonUtil.jsonToMap(message.body());
             Object key = map.get("key");
             Object iv = map.get("iv");
             Object cipher = map.get("cipher");
             // Message is a "normal" sqs message and should not be inflated
             if (key == null || iv == null || cipher == null) {
-                return;
+                return message;
             }
-            message.setBody(AmazonKMS.decrypt(kmsClient, key.toString(), iv.toString(), cipher.toString()));
+            message = message.copy(builder -> builder.body(AmazonKMS.decrypt(kmsClient, key.toString(), iv.toString(), cipher.toString())));
         }
+        return message;
     }
 
 
@@ -76,18 +78,16 @@ public class SqsKMSClient {
         }
     }
 
-    private void cleanMessageAttributes(Message message) {
+    private Map<String, MessageAttributeValue> cleanedMessageAttributes(Message message) {
         Map<String, MessageAttributeValue> messageAttributes = new HashMap<String, MessageAttributeValue>();
 
-        for (Map.Entry<String, MessageAttributeValue> entry : message.getMessageAttributes().entrySet()) {
+        for (Map.Entry<String, MessageAttributeValue> entry : message.messageAttributes().entrySet()) {
             if (!entry.getKey().equals(AWS_SQS_LARGE_PAYLOAD)) {
                 messageAttributes.put(entry.getKey(), entry.getValue());
             }
         }
-        message.clearMessageAttributesEntries();
-        message.setMessageAttributes(messageAttributes);
+        return messageAttributes;
     }
-
 
 
 }

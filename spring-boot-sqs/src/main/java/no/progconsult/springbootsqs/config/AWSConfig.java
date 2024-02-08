@@ -11,6 +11,8 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
+import java.util.Arrays;
+
 
 @Configuration
 public class AWSConfig {
@@ -86,36 +88,42 @@ public class AWSConfig {
         return new SqsKMSClient(awsCredentialsProvider, Region.of("eu-west-1"));
     }
 
-    @Bean
-    KMSMessageInterceptor kmsMessageInterceptor(SqsKMSClient sqsKMSClient){
-        return new KMSMessageInterceptor(sqsKMSClient);
-    }
+//    @Bean
+//    KMSMessageInterceptor kmsMessageInterceptor(SqsKMSClient sqsKMSClient){
+//        return new KMSMessageInterceptor(sqsKMSClient);
+//    }
 
 
+//    @Bean
+//    SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient) {
+//        SqsContainerOptions build = SqsContainerOptions.builder().messageConverter(new SqsMessagingMessageConverter()).build();
+//        return SqsMessageListenerContainerFactory
+//                .builder()
+////                .configure(options -> options
+////                        .messagesPerPoll(5)
+////                        .pollTimeout(Duration.ofSeconds(10)))
+//                .configure(options -> options.maxMessagesPerPoll(1))
+////                .containerComponentFactories(build)
+//
+//                .sqsAsyncClient(sqsAsyncClient)
+//                .build();
+//    }
+
     @Bean
-    SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient) {
-        SqsContainerOptions build = SqsContainerOptions.builder().messageConverter(new SqsMessagingMessageConverter()).build();
+    SqsMessageListenerContainerFactory<Object> volueSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, SqsKMSClient sqsKMSClient) {
+
+        QFSqsMessagingMessageConverter converter = new QFSqsMessagingMessageConverter(sqsKMSClient);
+
         return SqsMessageListenerContainerFactory
                 .builder()
+                .configure(options -> options
+                        .messageConverter(converter))
+//                .containerComponentFactories(Arrays.asList(standardSqsComponentFactory))
 //                .configure(options -> options
 //                        .messagesPerPoll(5)
 //                        .pollTimeout(Duration.ofSeconds(10)))
-                .configure(options -> options.maxMessagesPerPoll(1))
-//                .containerComponentFactories(build)
-
-                .sqsAsyncClient(sqsAsyncClient)
-                .build();
-    }
-
-    @Bean
-    SqsMessageListenerContainerFactory<Object> volueSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, KMSMessageInterceptor kmsMessageInterceptor) {
-        return SqsMessageListenerContainerFactory
-                .builder()
-//                .configure(options -> options
-//                        .messagesPerPoll(5)
-//                        .pollTimeout(Duration.ofSeconds(10)))
-                .configure(options -> options.maxMessagesPerPoll(1))
-                .messageInterceptor(kmsMessageInterceptor)
+//                .configure(options -> options.maxMessagesPerPoll(1))
+//                .messageInterceptor(kmsMessageInterceptor)
                 .sqsAsyncClient(sqsAsyncClient)
 
                 .build();
