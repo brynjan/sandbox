@@ -1,17 +1,18 @@
 package no.progconsult.springbootsqs.config;
 
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
-import io.awspring.cloud.sqs.listener.SqsContainerOptions;
-import io.awspring.cloud.sqs.support.converter.SqsMessagingMessageConverter;
+import io.awspring.cloud.sqs.operations.SqsOperations;
+import io.awspring.cloud.sqs.operations.SqsTemplate;
 import no.embriq.flow.aws.auth.AmazonCredentialsProvider;
+import no.embriq.quant.flow.common.utils.JsonMappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.MessageConverter;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
-
-import java.util.Arrays;
 
 
 @Configuration
@@ -73,7 +74,7 @@ public class AWSConfig {
 
 
     @Bean
-    SqsAsyncClient sqsAsyncClient(AwsCredentialsProvider awsCredentialsProvider, Environment env){
+    SqsAsyncClient sqsAsyncClient(AwsCredentialsProvider awsCredentialsProvider, Environment env) {
         SqsAsyncClient sqsAsyncClient = SqsAsyncClient
                 .builder()
                 .region(Region.of(env.getRequiredProperty("cognito.credentials.provider.awsRegion")))
@@ -84,7 +85,7 @@ public class AWSConfig {
     }
 
     @Bean
-    SqsKMSClient sqsKMSClient(AwsCredentialsProvider awsCredentialsProvider, Environment env){
+    SqsKMSClient sqsKMSClient(AwsCredentialsProvider awsCredentialsProvider, Environment env) {
         return new SqsKMSClient(awsCredentialsProvider, Region.of("eu-west-1"));
     }
 
@@ -110,14 +111,16 @@ public class AWSConfig {
 //    }
 
     @Bean
-    SqsMessageListenerContainerFactory<Object> volueSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, SqsKMSClient sqsKMSClient) {
+    SqsMessageListenerContainerFactory<Object> volueSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, SqsKMSClient sqsKMSClient, MessageConverter messageConverter) {
 
         QFSqsMessagingMessageConverter converter = new QFSqsMessagingMessageConverter(sqsKMSClient);
+        converter.setPayloadMessageConverter(messageConverter);
 
         return SqsMessageListenerContainerFactory
                 .builder()
                 .configure(options -> options
                         .messageConverter(converter))
+
 //                .containerComponentFactories(Arrays.asList(standardSqsComponentFactory))
 //                .configure(options -> options
 //                        .messagesPerPoll(5)
@@ -129,6 +132,17 @@ public class AWSConfig {
                 .build();
     }
 
+
+    @Bean
+    SqsOperations sqsTemplate(SqsAsyncClient sqsAsyncClient, SqsKMSClient sqsKMSClient, MessageConverter messageConverter) {
+        QFSqsMessagingMessageConverter converter = new QFSqsMessagingMessageConverter(sqsKMSClient);
+        converter.setPayloadMessageConverter(messageConverter);
+        SqsOperations sqsOperations = SqsTemplate.builder()
+                .sqsAsyncClient(sqsAsyncClient)
+                .messageConverter(converter)
+                .buildSyncTemplate();
+        return sqsOperations;
+    }
 
 //    @Bean
 //    MessageListenerContainer<Object> myListenerContainer(SqsAsyncClient sqsAsyncClient) {
@@ -204,14 +218,14 @@ public class AWSConfig {
 //        return new Receiver(amazonS3);
 //    }
 //
-//    @Bean
-//    MessageConverter converter() {
-//        MappingJackson2MessageConverter messageConverter = new MappingJackson2MessageConverter();
-//        messageConverter.setSerializedPayloadClass(String.class);
-//        messageConverter.setObjectMapper(JsonMappers.getObjectMapper());
-//        messageConverter.setStrictContentTypeMatch(false);
-//        return messageConverter;
-//    }
+    @Bean
+    MessageConverter converter() {
+        MappingJackson2MessageConverter messageConverter = new MappingJackson2MessageConverter();
+        messageConverter.setSerializedPayloadClass(String.class);
+        messageConverter.setObjectMapper(JsonMappers.getObjectMapper());
+        messageConverter.setStrictContentTypeMatch(false);
+        return messageConverter;
+    }
 //
 //    @Bean
 //    @Primary
