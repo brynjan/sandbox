@@ -1,5 +1,6 @@
 package no.progconsult.springbootsqs.config;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import no.embriq.flow.aws.sqs.util.JsonUtil;
 import no.embriq.flow.aws.sqs.v2.AmazonKMS;
@@ -14,6 +15,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,10 +30,16 @@ public class SqsKMSClient {
 
 
     private static final String AWS_SQS_LARGE_PAYLOAD = "AWS_SQS_LARGE_PAYLOAD";
+    public static final String ATTRIBUTE_KEY_KMS_CMK_ID = "_KMS_CMK_ID";
+    public static final String ATTRIBUTE_KEY_S3_BUCKET = "_S3_BUCKET";
     private static final String IDENTIFIER = "identifier";
     private static final String BUCKET = "bucket";
+    private static final String REGION = "region";
+    private static final int MAX_MESSAGE_SIZE = (1024 * 64 * 4) - (1024 * 16);
 
     private final AwsCredentialsProvider awsCredentialsProvider;
+
+    private final Region region;
     private final KmsClient kmsClient;
     private final S3Client s3Client;
     private final String kmsCmkId;
@@ -40,6 +48,7 @@ public class SqsKMSClient {
 
     public SqsKMSClient(AwsCredentialsProvider awsCredentialsProvider, Region region, String kmsCmkId, String s3Bucket) {
         this.awsCredentialsProvider = awsCredentialsProvider;
+        this.region = region;
         this.kmsClient = KmsClient.builder().credentialsProvider(awsCredentialsProvider).region(region).build();
         s3Client = S3Client.builder().credentialsProvider(awsCredentialsProvider).region(region).build();
         this.kmsCmkId = kmsCmkId;
@@ -77,39 +86,40 @@ public class SqsKMSClient {
 
     private SendMessageRequest deflate(SendMessageRequest sendMessageRequest) {
 
-//        String kmsCmkIdToUse = kmsCmkId;
+        String kmsCmkIdToUse = kmsCmkId;
+        com.amazonaws.services.sqs.model.MessageAttributeValue kmsCmkIdAttribute = sendMessageRequest.getMessageAttributes().get(ATTRIBUTE_KEY_KMS_CMK_ID);
 //        com.amazonaws.services.sqs.model.MessageAttributeValue kmsCmkIdAttribute = sendMessageRequest.getMessageAttributes().get(ATTRIBUTE_KEY_KMS_CMK_ID);
-//        if (kmsCmkIdAttribute != null) {
-//            kmsCmkIdToUse = kmsCmkIdAttribute.getStringValue();
-//            sendMessageRequest.getMessageAttributes().remove(ATTRIBUTE_KEY_KMS_CMK_ID);
-//        }
-//
-//        String s3BucketToUse = s3Bucket;
-//        com.amazonaws.services.sqs.model.MessageAttributeValue s3BucketAttribute = sendMessageRequest.getMessageAttributes().get(ATTRIBUTE_KEY_S3_BUCKET);
-//        if (s3BucketAttribute != null) {
-//            s3BucketToUse = s3BucketAttribute.getStringValue();
-//            sendMessageRequest.getMessageAttributes().remove(ATTRIBUTE_KEY_S3_BUCKET);
-//        }
-//
-//        String payload = AmazonKMS.encrypt(kms, kmsCmkIdToUse, sendMessageRequest.getMessageBody());
-//        Map<Object, Object> map = new HashMap<Object, Object>();
-//
-//        map.put(REGION, region.getName());
-//
-//        if (payload.length() >= MAX_MESSAGE_SIZE) {
-//            String uuid = UUID.randomUUID().toString();
-//
-//            map.put(BUCKET, s3BucketToUse);
-//            map.put(IDENTIFIER, uuid);
-//
-//            sendMessageRequest.addMessageAttributesEntry(AWS_SQS_LARGE_PAYLOAD, new com.amazonaws.services.sqs.model.MessageAttributeValue().withDataType("String").withStringValue(JsonUtil.mapToJson(map)));
-//            sendMessageRequest.setMessageBody("{}");
-//
-//            write(s3BucketToUse, uuid, payload, sendMessageRequest.getQueueUrl());
-//        } else {
+        if (kmsCmkIdAttribute != null) {
+            kmsCmkIdToUse = kmsCmkIdAttribute.getStringValue();
+            sendMessageRequest.getMessageAttributes().remove(ATTRIBUTE_KEY_KMS_CMK_ID);
+        }
+
+        String s3BucketToUse = s3Bucket;
+        com.amazonaws.services.sqs.model.MessageAttributeValue s3BucketAttribute = sendMessageRequest.getMessageAttributes().get(ATTRIBUTE_KEY_S3_BUCKET);
+        if (s3BucketAttribute != null) {
+            s3BucketToUse = s3BucketAttribute.getStringValue();
+            sendMessageRequest.getMessageAttributes().remove(ATTRIBUTE_KEY_S3_BUCKET);
+        }
+
+        String payload = AmazonKMS.encrypt(kmsClient, kmsCmkIdToUse, sendMessageRequest.getMessageBody());
+        Map<Object, Object> map = new HashMap<Object, Object>();
+
+        map.put(REGION, region.id());
+
+        if (payload.length() >= MAX_MESSAGE_SIZE) {
+            String uuid = UUID.randomUUID().toString();
+
+            map.put(BUCKET, s3BucketToUse);
+            map.put(IDENTIFIER, uuid);
+
+            sendMessageRequest.addMessageAttributesEntry(AWS_SQS_LARGE_PAYLOAD, new com.amazonaws.services.sqs.model.MessageAttributeValue().withDataType("String").withStringValue(JsonUtil.mapToJson(map)));
+            sendMessageRequest.setMessageBody("{}");
+
+            write(s3BucketToUse, uuid, payload, sendMessageRequest.getQueueUrl());
+        } else {
 //            sendMessageRequest.addMessageAttributesEntry(AWS_SQS_LARGE_PAYLOAD, new com.amazonaws.services.sqs.model.MessageAttributeValue().withDataType("String").withStringValue(JsonUtil.mapToJson(map)));
 //            sendMessageRequest.setMessageBody(payload);
-//        }
+        }
 //
 //        return sendMessageRequest;
         return null;
@@ -124,6 +134,18 @@ public class SqsKMSClient {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void write(final String bucket, final String key, final String payload, final String queue) {
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        byte[] buffer = payload.getBytes(StandardCharsets.UTF_8);
+        Map<String, String> map = new HashMap<String, String>();
+
+        map.put("sqs-queue", queue);
+        objectMetadata.setUserMetadata(map);
+        objectMetadata.setContentLength(buffer.length);
+
+//        s3Client.putObject(bucket, key, new ByteArrayInputStream(buffer), objectMetadata);
     }
 
     private Map<String, MessageAttributeValue> cleanedMessageAttributes(Message message) {
