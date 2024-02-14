@@ -1,5 +1,6 @@
 package no.progconsult.springbootsqs.config;
 
+import com.amazonaws.services.sqs.model.SendMessageRequest;
 import no.embriq.flow.aws.sqs.util.JsonUtil;
 import no.embriq.flow.aws.sqs.v2.AmazonKMS;
 import org.springframework.util.StreamUtils;
@@ -16,6 +17,7 @@ import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author <a href="mailto:brynjar.norum@embriq.no">Brynjar Norum</a> 2024-02-07.
@@ -32,11 +34,16 @@ public class SqsKMSClient {
     private final AwsCredentialsProvider awsCredentialsProvider;
     private final KmsClient kmsClient;
     private final S3Client s3Client;
+    private final String kmsCmkId;
+    private final String s3Bucket;
 
-    public SqsKMSClient(AwsCredentialsProvider awsCredentialsProvider, Region region) {
+
+    public SqsKMSClient(AwsCredentialsProvider awsCredentialsProvider, Region region, String kmsCmkId, String s3Bucket) {
         this.awsCredentialsProvider = awsCredentialsProvider;
         this.kmsClient = KmsClient.builder().credentialsProvider(awsCredentialsProvider).region(region).build();
         s3Client = S3Client.builder().credentialsProvider(awsCredentialsProvider).region(region).build();
+        this.kmsCmkId = kmsCmkId;
+        this.s3Bucket = s3Bucket;
     }
 
 
@@ -67,6 +74,47 @@ public class SqsKMSClient {
         }
         return message;
     }
+
+    private SendMessageRequest deflate(SendMessageRequest sendMessageRequest) {
+
+//        String kmsCmkIdToUse = kmsCmkId;
+//        com.amazonaws.services.sqs.model.MessageAttributeValue kmsCmkIdAttribute = sendMessageRequest.getMessageAttributes().get(ATTRIBUTE_KEY_KMS_CMK_ID);
+//        if (kmsCmkIdAttribute != null) {
+//            kmsCmkIdToUse = kmsCmkIdAttribute.getStringValue();
+//            sendMessageRequest.getMessageAttributes().remove(ATTRIBUTE_KEY_KMS_CMK_ID);
+//        }
+//
+//        String s3BucketToUse = s3Bucket;
+//        com.amazonaws.services.sqs.model.MessageAttributeValue s3BucketAttribute = sendMessageRequest.getMessageAttributes().get(ATTRIBUTE_KEY_S3_BUCKET);
+//        if (s3BucketAttribute != null) {
+//            s3BucketToUse = s3BucketAttribute.getStringValue();
+//            sendMessageRequest.getMessageAttributes().remove(ATTRIBUTE_KEY_S3_BUCKET);
+//        }
+//
+//        String payload = AmazonKMS.encrypt(kms, kmsCmkIdToUse, sendMessageRequest.getMessageBody());
+//        Map<Object, Object> map = new HashMap<Object, Object>();
+//
+//        map.put(REGION, region.getName());
+//
+//        if (payload.length() >= MAX_MESSAGE_SIZE) {
+//            String uuid = UUID.randomUUID().toString();
+//
+//            map.put(BUCKET, s3BucketToUse);
+//            map.put(IDENTIFIER, uuid);
+//
+//            sendMessageRequest.addMessageAttributesEntry(AWS_SQS_LARGE_PAYLOAD, new com.amazonaws.services.sqs.model.MessageAttributeValue().withDataType("String").withStringValue(JsonUtil.mapToJson(map)));
+//            sendMessageRequest.setMessageBody("{}");
+//
+//            write(s3BucketToUse, uuid, payload, sendMessageRequest.getQueueUrl());
+//        } else {
+//            sendMessageRequest.addMessageAttributesEntry(AWS_SQS_LARGE_PAYLOAD, new com.amazonaws.services.sqs.model.MessageAttributeValue().withDataType("String").withStringValue(JsonUtil.mapToJson(map)));
+//            sendMessageRequest.setMessageBody(payload);
+//        }
+//
+//        return sendMessageRequest;
+        return null;
+    }
+
 
 
     private String read(final String bucket, final String key) {
