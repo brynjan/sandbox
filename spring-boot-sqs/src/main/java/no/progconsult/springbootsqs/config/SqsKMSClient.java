@@ -7,11 +7,13 @@ import no.embriq.flow.aws.sqs.v2.AmazonKMS;
 import org.springframework.util.StreamUtils;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.kms.KmsClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
@@ -141,11 +143,12 @@ public class SqsKMSClient {
         byte[] buffer = payload.getBytes(StandardCharsets.UTF_8);
         Map<String, String> map = new HashMap<String, String>();
 
+
         map.put("sqs-queue", queue);
         objectMetadata.setUserMetadata(map);
         objectMetadata.setContentLength(buffer.length);
 
-//        s3Client.putObject(bucket, key, new ByteArrayInputStream(buffer), objectMetadata);
+        s3Client.putObject(PutObjectRequest.builder().bucket(bucket).key(key).metadata(map).contentLength((long) buffer.length).build(), RequestBody.fromBytes(buffer));
     }
 
     private Map<String, MessageAttributeValue> cleanedMessageAttributes(Message message) {
