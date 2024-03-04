@@ -33,12 +33,20 @@ public class SendToSqsRoute {
         agentSqsHeader.put("_KMS_CMK_ID", "alias/embriq-volue-test");
         agentSqsHeader.put("_S3_BUCKET", "embriq-volue-test.eu-west-1.416899602824");
 
+        String story = "Det var en lang historie";
+        StringBuffer buf = new StringBuffer(story);
+        for(int i = 0; i<5_000_000;i++){
+            buf.append(story);
+        }
+
+
         QFEvent qfEvent = new QFEvent()
                 .withMessageId(UUID.randomUUID().toString())
                 .withDateCreated(Instant.now())
                 .withMessageType("Ukjent")
-                .withPayload("Play");
+                .withPayload(buf.toString());
 
+        LOG.info("Lengde: {}", story.length());
 
         sqsOperations.send(sqsSendOptions -> sqsSendOptions.queue("embriq-volueagent-volueadapter").headers(agentSqsHeader).payload(qfEvent));
         LOG.info("Mesasge sent");
