@@ -2,6 +2,7 @@ package no.progconsult.springbootsqs.config;
 
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import no.embriq.quant.flow.typelib.common.QFEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,8 @@ public class MessageConsumerOld {
     @SqsListener(value = "embriq-volueagent-in-test", factory = "volueSqsListenerContainerFactory")
     public void receiveVolueMore(QFEvent message) {
         // Process the received message
-        System.out.println("Received message. Size: {}" + message.getPayload().length());
+        System.out.println("Received message. Size: " + message.getPayload().length());
+        System.out.println(StringUtils.abbreviate(message.getPayload(), 100_000));
     }
 
 

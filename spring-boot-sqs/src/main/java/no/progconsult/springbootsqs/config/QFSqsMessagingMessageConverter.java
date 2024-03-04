@@ -28,6 +28,8 @@ public class QFSqsMessagingMessageConverter extends SqsMessagingMessageConverter
     @Override
     protected Message doConvertMessage(Message messageWithHeaders, Object payload) {
         LOG.info("Inne i converter");
-        return super.doConvertMessage(messageWithHeaders, payload);
+        Message message = super.doConvertMessage(messageWithHeaders, payload);
+        Message deflated = sqsKMSClient.deflate(message);
+        return deflated;
     }
 }
