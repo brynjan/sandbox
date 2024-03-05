@@ -4,6 +4,8 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import no.embriq.flow.aws.sqs.util.JsonUtil;
 import no.embriq.flow.aws.sqs.v2.AmazonKMS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StreamUtils;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -30,6 +32,7 @@ import java.util.UUID;
 
 public class SqsKMSClient {
 
+    private transient static final Logger LOG = LoggerFactory.getLogger(SqsKMSClient.class);
 
     private static final String AWS_SQS_LARGE_PAYLOAD = "AWS_SQS_LARGE_PAYLOAD";
     public static final String ATTRIBUTE_KEY_KMS_CMK_ID = "_KMS_CMK_ID";
@@ -141,6 +144,7 @@ public class SqsKMSClient {
 
             write(s3BucketToUse, uuid, payload);
             message = message.copy(builder -> builder.body("{}").messageAttributes(messageAttributes));
+            System.out.println();
         } else {
             messageAttributes.put(AWS_SQS_LARGE_PAYLOAD, MessageAttributeValue.builder().dataType("String").stringValue(JsonUtil.mapToJson(map)).build());
             message = message.copy(builder -> builder.body(payload).messageAttributes(messageAttributes));

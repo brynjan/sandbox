@@ -29,9 +29,9 @@ public class SendToSqsRoute {
 
     public void send(){
 
-        Map<String, Object> agentSqsHeader = new HashMap<>();
-        agentSqsHeader.put("_KMS_CMK_ID", "alias/embriq-volue-test");
-        agentSqsHeader.put("_S3_BUCKET", "embriq-volue-test.eu-west-1.416899602824");
+//        Map<String, Object> agentSqsHeader = new HashMap<>();
+//        agentSqsHeader.put("_KMS_CMK_ID", "alias/embriq-volue-test");
+//        agentSqsHeader.put("_S3_BUCKET", "embriq-volue-test.eu-west-1.416899602824");
 
         String story = "Det var en lang historie";
         StringBuffer buf = new StringBuffer(story);
@@ -48,7 +48,8 @@ public class SendToSqsRoute {
 
         LOG.info("Lengde: {}", story.length());
 
-        sqsOperations.send(sqsSendOptions -> sqsSendOptions.queue("embriq-volueagent-volueadapter").headers(agentSqsHeader).payload(qfEvent));
+//        sqsOperations.send(sqsSendOptions -> sqsSendOptions.queue("embriq-volueagent-volueadapter").headers(agentSqsHeader).payload(qfEvent));
+        sqsOperations.send(sqsSendOptions -> sqsSendOptions.queue("embriq-volueagent-volueadapter").payload(qfEvent));
         LOG.info("Mesasge sent");
     }
 }

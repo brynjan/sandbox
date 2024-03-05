@@ -86,7 +86,7 @@ public class AWSConfig {
 
     @Bean
     SqsKMSClient sqsKMSClient(AwsCredentialsProvider awsCredentialsProvider, Environment env) {
-        return new SqsKMSClient(awsCredentialsProvider, Region.of("eu-west-1"), "alias/embriq-volue-test", "embriq-volue-test.eu-west-1.410767370853");
+        return new SqsKMSClient(awsCredentialsProvider, Region.of("eu-west-1"), env.getRequiredProperty("sqs.kms.cmk"), env.getRequiredProperty("sqs.s3.bucket"));
     }
 
 //    @Bean
