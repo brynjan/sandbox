@@ -2,6 +2,7 @@ package no.progconsult.springbootsqs.config;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.amazonaws.util.IOUtils;
 import no.embriq.flow.aws.sqs.util.JsonUtil;
 import no.embriq.flow.aws.sqs.v2.AmazonKMS;
 import org.slf4j.Logger;
@@ -163,7 +164,8 @@ public class SqsKMSClient {
     private String read(final String bucket, final String key) {
         try {
             ResponseInputStream<GetObjectResponse> response = s3Client.getObject(GetObjectRequest.builder().bucket(bucket).key(key).build());
-            return StreamUtils.copyToString(response, StandardCharsets.UTF_8);
+            return IOUtils.toString(response);
+//            return StreamUtils.copyToString(response, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -191,6 +193,4 @@ public class SqsKMSClient {
 
         return messageAttributes;
     }
-
-
 }
