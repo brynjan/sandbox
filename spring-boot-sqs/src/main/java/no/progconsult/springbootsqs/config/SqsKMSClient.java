@@ -188,6 +188,7 @@ public class SqsKMSClient {
                 messageAttributes.put(entry.getKey(), entry.getValue());
             }
         }
+
         return messageAttributes;
     }
 

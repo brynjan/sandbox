@@ -5,6 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import software.amazon.awssdk.services.sqs.model.Message;
+import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import static no.embriq.quant.flow.common.config.Constants.BREADCRUMB_ID;
 
@@ -24,6 +28,8 @@ public class QFSqsMessagingMessageConverter extends SqsMessagingMessageConverter
 
     @Override
     protected Object getPayloadToDeserialize(Message message) {
+        String breadcrumbId = Optional.ofNullable(message.messageAttributes().get(BREADCRUMB_ID)).map(MessageAttributeValue::stringValue).orElseGet(() -> "ID-" + UUID.randomUUID());
+        MDC.put(BREADCRUMB_ID, breadcrumbId);
         Message inflatedMessage = sqsKMSClient.inflate(message);
         return super.getPayloadToDeserialize(inflatedMessage);
     }
