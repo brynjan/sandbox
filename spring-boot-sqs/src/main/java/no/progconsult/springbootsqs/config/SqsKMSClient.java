@@ -6,6 +6,7 @@ import no.embriq.flow.aws.sqs.util.JsonUtil;
 import no.embriq.flow.aws.sqs.v2.AmazonKMS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.util.StreamUtils;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -23,7 +24,10 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+
+import static no.embriq.quant.flow.common.config.Constants.BREADCRUMB_ID;
 
 /**
  * @author <a href="mailto:brynjar.norum@embriq.no">Brynjar Norum</a> 2024-02-07.
@@ -106,6 +110,9 @@ public class SqsKMSClient {
                 messageAttributes.put(entry.getKey(), entry.getValue());
             }
         }
+
+        final String breadcrumbId = Optional.ofNullable(MDC.get(BREADCRUMB_ID)).orElseGet(() -> "ID-" + UUID.randomUUID().toString());
+        messageAttributes.put(BREADCRUMB_ID, MessageAttributeValue.builder().dataType("String").stringValue(breadcrumbId).build());
 
 
 //

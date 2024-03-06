@@ -3,7 +3,10 @@ package no.progconsult.springbootsqs.config;
 import io.awspring.cloud.sqs.support.converter.SqsMessagingMessageConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import software.amazon.awssdk.services.sqs.model.Message;
+
+import static no.embriq.quant.flow.common.config.Constants.BREADCRUMB_ID;
 
 /**
  * @author <a href="mailto:brynjar.norum@embriq.no">Brynjar Norum</a> 2024-02-08.
@@ -31,6 +34,7 @@ public class QFSqsMessagingMessageConverter extends SqsMessagingMessageConverter
         Message message = super.doConvertMessage(messageWithHeaders, payload);
 //        return message;
         Message deflated = sqsKMSClient.deflate(message);
+
         return deflated;
     }
 }

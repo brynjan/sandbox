@@ -89,10 +89,10 @@ public class AWSConfig {
         return new SqsKMSClient(awsCredentialsProvider, Region.of("eu-west-1"), env.getRequiredProperty("sqs.kms.cmk"), env.getRequiredProperty("sqs.s3.bucket"));
     }
 
-//    @Bean
-//    KMSMessageInterceptor kmsMessageInterceptor(SqsKMSClient sqsKMSClient){
-//        return new KMSMessageInterceptor(sqsKMSClient);
-//    }
+    @Bean
+    KMSMessageInterceptor kmsMessageInterceptor(SqsKMSClient sqsKMSClient){
+        return new KMSMessageInterceptor(sqsKMSClient);
+    }
 
 
 //    @Bean
