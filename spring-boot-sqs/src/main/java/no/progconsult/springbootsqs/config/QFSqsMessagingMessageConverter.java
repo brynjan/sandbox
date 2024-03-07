@@ -7,6 +7,8 @@ import org.slf4j.MDC;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,7 +41,10 @@ public class QFSqsMessagingMessageConverter extends SqsMessagingMessageConverter
         LOG.info("Inne i converter");
         Message message = super.doConvertMessage(messageWithHeaders, payload);
 //        return message;
-        Message deflated = sqsKMSClient.deflate(message);
+
+        final String breadcrumbId = Optional.ofNullable(MDC.get(BREADCRUMB_ID)).orElseGet(() -> "ID-" + UUID.randomUUID().toString());
+        Message deflated = sqsKMSClient.deflate(message, breadcrumbId);
+
 
         return deflated;
     }

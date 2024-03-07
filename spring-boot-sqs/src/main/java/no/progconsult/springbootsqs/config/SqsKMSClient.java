@@ -94,13 +94,16 @@ public class SqsKMSClient {
         return message;
     }
 
-    public Message deflate(Message message) {
+    public Message deflate(Message message, final String breadcrumbId) {
 
 
         String kmsCmkIdToUse = kmsCmkId;
         String s3BucketToUse = s3Bucket;
 
         Map<String, MessageAttributeValue> messageAttributes = new HashMap<String, MessageAttributeValue>();
+
+        messageAttributes.put(BREADCRUMB_ID, MessageAttributeValue.builder().dataType("String").stringValue(breadcrumbId).build());
+
         for (Map.Entry<String, MessageAttributeValue> entry : message.messageAttributes().entrySet()) {
 
             if (entry.getKey().equals(ATTRIBUTE_KEY_KMS_CMK_ID)) {
@@ -112,8 +115,6 @@ public class SqsKMSClient {
             }
         }
 
-        final String breadcrumbId = Optional.ofNullable(MDC.get(BREADCRUMB_ID)).orElseGet(() -> "ID-" + UUID.randomUUID().toString());
-        messageAttributes.put(BREADCRUMB_ID, MessageAttributeValue.builder().dataType("String").stringValue(breadcrumbId).build());
 
 
 //
