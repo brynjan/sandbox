@@ -70,7 +70,7 @@
         <dependency>
             <groupId>no.embriq.quant.flow</groupId>
             <artifactId>flow-aws-sqs</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/kms -->
         <dependency>
@@ -186,6 +186,12 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-contract-stub-runner</artifactId>
             <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.elasticmq/elasticmq-rest-sqs -->
+        <dependency>
+            <groupId>org.elasticmq</groupId>
+            <artifactId>elasticmq-rest-sqs_3</artifactId>
+            <version>1.5.7</version>
         </dependency>
 
 

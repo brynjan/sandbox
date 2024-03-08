@@ -1,7 +1,20 @@
 package no.progconsult.springbootsqs.config;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+import software.amazon.awssdk.services.sqs.endpoints.SqsEndpointProvider;
+
+import java.net.URI;
+import java.util.Optional;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -10,6 +23,37 @@ public class TestConfig {
 
     private transient static final Logger LOG = getLogger(TestConfig.class);
 
+
+
+    @Bean
+    public SqsServerMock sqsServerMock() {
+        SqsServerMock sqsServerMock = new SqsServerMock();
+        return sqsServerMock;
+    }
+
+    @Primary
+    @Bean
+    SqsAsyncClient sqsAsyncClient(SqsServerMock sqsServerMock) {
+
+        try {
+
+            int port = sqsServerMock.getPort();
+            String endpoint = "http://localhost:" + port;
+            String region = "elasticmq";
+            String accessKey = "x";
+            String secretKey = "x";
+
+            AwsBasicCredentials awsSessionCredentials = AwsBasicCredentials.create(accessKey, secretKey);
+
+            StaticCredentialsProvider staticCredentialsProvider = StaticCredentialsProvider.create(awsSessionCredentials);
+
+            URI myUri = new URI(endpoint);
+            SqsAsyncClient sqsAsyncClient = SqsAsyncClient.builder().credentialsProvider(staticCredentialsProvider).region(Region.of(region)).endpointOverride(myUri).build();
+            return sqsAsyncClient;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 //    @Bean(destroyMethod = "stopSqsServer")
 //    public SqsServerMock sqsServerMock() {
