@@ -3,8 +3,13 @@ package no.progconsult.springbootsqs.config;
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import io.awspring.cloud.sqs.operations.SqsOperations;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
+import io.awspring.cloud.sqs.support.converter.SqsMessagingMessageConverter;
 import no.embriq.flow.aws.auth.AmazonCredentialsProvider;
+import no.embriq.flow.aws.sqs.v2.SqsExtendedClient;
 import no.embriq.quant.flow.common.utils.JsonMappers;
+import no.progconsult.springbootsqs.common.BreadcrumbMessageInterceptor;
+import no.progconsult.springbootsqs.common.ExtendedSqsMessagingMessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -13,6 +18,8 @@ import org.springframework.messaging.converter.MessageConverter;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+
+import java.time.Duration;
 
 
 @Configuration
@@ -84,15 +91,23 @@ public class AWSConfig {
         // add more Options
     }
 
-    @Bean
-    SqsKMSClient sqsKMSClient(AwsCredentialsProvider awsCredentialsProvider, Environment env) {
-        return new SqsKMSClient(awsCredentialsProvider, Region.of("eu-west-1"), env.getRequiredProperty("sqs.kms.cmk"), env.getRequiredProperty("sqs.s3.bucket"));
-    }
 
     @Bean
-    KMSMessageInterceptor kmsMessageInterceptor(SqsKMSClient sqsKMSClient){
-        return new KMSMessageInterceptor(sqsKMSClient);
+    SqsExtendedClient sqsExtendedClient(AwsCredentialsProvider awsCredentialsProvider, Environment env) {
+        return new SqsExtendedClient(awsCredentialsProvider,  Region.of("eu-west-1"), env.getRequiredProperty("sqs.kms.cmk"), env.getRequiredProperty("sqs.s3.bucket"));
     }
+
+
+
+//    @Bean
+//    SqsKMSClient sqsKMSClient(AwsCredentialsProvider awsCredentialsProvider, Environment env) {
+//        return new SqsKMSClient(awsCredentialsProvider, Region.of("eu-west-1"), env.getRequiredProperty("sqs.kms.cmk"), env.getRequiredProperty("sqs.s3.bucket"));
+//    }
+
+//    @Bean
+//    KMSMessageInterceptor kmsMessageInterceptor(SqsKMSClient sqsKMSClient){
+//        return new KMSMessageInterceptor(sqsKMSClient);
+//    }
 
 
 //    @Bean
@@ -111,40 +126,70 @@ public class AWSConfig {
 //    }
 
     @Bean
-    SqsMessageListenerContainerFactory<Object> volueSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, SqsKMSClient sqsKMSClient, MessageConverter messageConverter) {
-
-        QFSqsMessagingMessageConverter converter = new QFSqsMessagingMessageConverter(sqsKMSClient);
+    SqsMessagingMessageConverter sqsMessagingMessageConverter(SqsExtendedClient sqsExtendedClient, MessageConverter messageConverter) {
+        ExtendedSqsMessagingMessageConverter converter = new ExtendedSqsMessagingMessageConverter(sqsExtendedClient);
         converter.setPayloadMessageConverter(messageConverter);
-
-        return SqsMessageListenerContainerFactory
-                .builder()
-                .configure(options -> options
-                        .messageConverter(converter))
-
-//                .containerComponentFactories(Arrays.asList(standardSqsComponentFactory))
-//                .configure(options -> options
-//                        .messagesPerPoll(5)
-//                        .pollTimeout(Duration.ofSeconds(10)))
-//                .configure(options -> options.maxMessagesPerPoll(1))
-//                .messageInterceptor(kmsMessageInterceptor)
-                .sqsAsyncClient(sqsAsyncClient)
-
-                .build();
+        return converter;
     }
 
 
     @Bean
-    SqsOperations sqsOperations(SqsAsyncClient sqsAsyncClient, SqsKMSClient sqsKMSClient, MessageConverter messageConverter) {
-        QFSqsMessagingMessageConverter converter = new QFSqsMessagingMessageConverter(sqsKMSClient);
-        converter.setPayloadMessageConverter(messageConverter);
-
-        SqsOperations sqsOperations = SqsTemplate.builder()
+    SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, SqsMessagingMessageConverter sqsMessagingMessageConverter, @Value("${sqs.poll.timeout}") Duration pollTimeout) {
+        return SqsMessageListenerContainerFactory
+                .builder()
+                .configure(options -> options
+                        .maxMessagesPerPoll(10)
+                        .pollTimeout(pollTimeout)
+                        .messageConverter(sqsMessagingMessageConverter))
                 .sqsAsyncClient(sqsAsyncClient)
-                .messageConverter(converter)
-                .buildSyncTemplate();
-
-        return sqsOperations;
+                .messageInterceptor(new BreadcrumbMessageInterceptor())
+                .build();
     }
+
+//    @Bean
+//    SqsMessageListenerContainerFactory<Object> volueSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, SqsKMSClient sqsKMSClient, MessageConverter messageConverter, KMSMessageInterceptor kmsMessageInterceptor) {
+//
+//        QFSqsMessagingMessageConverter converter = new QFSqsMessagingMessageConverter(sqsKMSClient);
+//        converter.setPayloadMessageConverter(messageConverter);
+//
+//        return SqsMessageListenerContainerFactory
+//                .builder()
+//                .configure(options -> options
+//                        .messageConverter(converter))
+//
+////                .containerComponentFactories(Arrays.asList(standardSqsComponentFactory))
+////                .configure(options -> options
+////                        .messagesPerPoll(5)
+////                        .pollTimeout(Duration.ofSeconds(10)))
+////                .configure(options -> options.maxMessagesPerPoll(1))
+//                .messageInterceptor(kmsMessageInterceptor)
+//                .sqsAsyncClient(sqsAsyncClient)
+//
+//                .build();
+//    }
+
+
+    @Bean
+    SqsTemplate sqsTemplate(SqsAsyncClient sqsAsyncClient, SqsMessagingMessageConverter sqsMessagingMessageConverter) {
+        SqsTemplate sqsTemplate = SqsTemplate.builder()
+                .sqsAsyncClient(sqsAsyncClient)
+                .messageConverter(sqsMessagingMessageConverter)
+                .build();
+        return sqsTemplate;
+    }
+//
+//    @Bean
+//    SqsOperations sqsOperations(SqsAsyncClient sqsAsyncClient, SqsKMSClient sqsKMSClient, MessageConverter messageConverter) {
+//        QFSqsMessagingMessageConverter converter = new QFSqsMessagingMessageConverter(sqsKMSClient);
+//        converter.setPayloadMessageConverter(messageConverter);
+//
+//        SqsOperations sqsOperations = SqsTemplate.builder()
+//                .sqsAsyncClient(sqsAsyncClient)
+//                .messageConverter(converter)
+//                .buildSyncTemplate();
+//
+//        return sqsOperations;
+//    }
 
 //    @Bean
 //    MessageListenerContainer<Object> myListenerContainer(SqsAsyncClient sqsAsyncClient) {
@@ -228,6 +273,7 @@ public class AWSConfig {
         messageConverter.setStrictContentTypeMatch(false);
         return messageConverter;
     }
+
 //
 //    @Bean
 //    @Primary

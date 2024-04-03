@@ -27,4 +27,10 @@ public class KMSMessageInterceptor implements MessageInterceptor<Object> {
 
         return MessageInterceptor.super.intercept(message);
     }
+
+    @Override
+    public void afterProcessing(Message<Object> message, Throwable t) {
+        System.out.println();
+        MessageInterceptor.super.afterProcessing(message, t);
+    }
 }

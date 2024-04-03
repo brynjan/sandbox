@@ -21,7 +21,7 @@ public class MessageConsumerOld {
         this.sqsBackOff = sqsBackOff;
     }
 
-    @SqsListener(value = "embriq-volueagent-in-test", factory = "volueSqsListenerContainerFactory")
+    @SqsListener(value = "embriq-volueagent-in-test")
     public void receiveVolueMore(QFEvent message) {
         // Process the received message
         System.out.println("Received message. Size: " + message.getPayload().length());

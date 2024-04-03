@@ -1,6 +1,7 @@
 package no.progconsult.springbootsqs.common;
 
 import io.awspring.cloud.sqs.operations.SqsOperations;
+import io.awspring.cloud.sqs.operations.SqsTemplate;
 import no.embriq.quant.flow.typelib.common.QFEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +22,10 @@ public class SendToSqsRoute {
 
     private static final Logger LOG = LoggerFactory.getLogger(SendToSqsRoute.class);
 
-    private final SqsOperations sqsOperations;
+    private final SqsTemplate sqsTemplate;
 
-    public SendToSqsRoute(@Qualifier("sqsOperations")SqsOperations sqsOperations) {
-        this.sqsOperations = sqsOperations;
+    public SendToSqsRoute(SqsTemplate sqsTemplate) {
+        this.sqsTemplate = sqsTemplate;
     }
 
     public void send(){
@@ -35,7 +36,7 @@ public class SendToSqsRoute {
 
         String story = "Det var en lang historie";
         StringBuffer buf = new StringBuffer(story);
-        for(int i = 0; i<5_000_000;i++){
+        for(int i = 0; i<4_000_000;i++){
             buf.append(story);
         }
 
@@ -44,12 +45,13 @@ public class SendToSqsRoute {
                 .withMessageId(UUID.randomUUID().toString())
                 .withDateCreated(Instant.now())
                 .withMessageType("Ukjent")
+//                .withPayload("test");
                 .withPayload(buf.toString());
 
-        LOG.info("Lengde: {}", story.length());
+        LOG.info("Lengde: {}", buf.toString().length());
 
 //        sqsOperations.send(sqsSendOptions -> sqsSendOptions.queue("embriq-volueagent-volueadapter").headers(agentSqsHeader).payload(qfEvent));
-        sqsOperations.send(sqsSendOptions -> sqsSendOptions.queue("embriq-volueagent-volueadapter").payload(qfEvent));
+        sqsTemplate.send(sqsSendOptions -> sqsSendOptions.queue("embriq-volueagent-volueadapter").payload(qfEvent));
         LOG.info("Mesasge sent");
     }
 }

@@ -1,14 +1,11 @@
 package no.progconsult.springbootsqs.config;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.amazonaws.util.IOUtils;
 import no.embriq.flow.aws.sqs.util.JsonUtil;
-import no.embriq.flow.aws.sqs.v2.AmazonKMS;
+import no.embriq.flow.aws.sqs.v2.KmsExtendedClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.springframework.util.StreamUtils;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -21,11 +18,9 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
-import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import static no.embriq.quant.flow.common.config.Constants.BREADCRUMB_ID;
@@ -73,9 +68,9 @@ public class SqsKMSClient {
 
             final String body;
             if (map.containsKey(IDENTIFIER)) {
-                body = AmazonKMS.decrypt(kmsClient, read(map.get(BUCKET).toString(), map.get(IDENTIFIER).toString()));
+                body = KmsExtendedClient.decrypt(kmsClient, read(map.get(BUCKET).toString(), map.get(IDENTIFIER).toString()));
             } else {
-                body = AmazonKMS.decrypt(kmsClient, message.body());
+                body = KmsExtendedClient.decrypt(kmsClient, message.body());
             }
 
             Map<String, MessageAttributeValue> cleanedMessageAttributes = cleanedMessageAttributes(message);
@@ -89,7 +84,7 @@ public class SqsKMSClient {
             if (key == null || iv == null || cipher == null) {
                 return message;
             }
-            message = message.copy(builder -> builder.body(AmazonKMS.decrypt(kmsClient, key.toString(), iv.toString(), cipher.toString())));
+            message = message.copy(builder -> builder.body(KmsExtendedClient.decrypt(kmsClient, key.toString(), iv.toString(), cipher.toString())));
         }
         return message;
     }
@@ -116,7 +111,6 @@ public class SqsKMSClient {
         }
 
 
-
 //
 //        String kmsCmkIdToUse = kmsCmkId;
 //        MessageAttributeValue kmsCmkMessageAttributeValue = message.messageAttributes().get(ATTRIBUTE_KEY_KMS_CMK_ID);
@@ -133,11 +127,15 @@ public class SqsKMSClient {
 //            sendMessageRequest.getMessageAttributes().remove(ATTRIBUTE_KEY_S3_BUCKET);
 //        }
 
-        String payload = AmazonKMS.encrypt(kmsClient, kmsCmkIdToUse, message.body());
+        String payload = KmsExtendedClient.encrypt(kmsClient, kmsCmkIdToUse, message.body());
         Map<Object, Object> map = new HashMap<Object, Object>();
 
         map.put(REGION, region.id());
 
+
+        int length = payload.length();
+        int maxMessageSize = MAX_MESSAGE_SIZE;
+        LOG.info("Length: {}, maxSize: {}", length, maxMessageSize);
 
         if (payload.length() >= MAX_MESSAGE_SIZE) {
             String uuid = UUID.randomUUID().toString();
@@ -153,6 +151,7 @@ public class SqsKMSClient {
 
             write(s3BucketToUse, uuid, payload);
             message = message.copy(builder -> builder.body("{}").messageAttributes(messageAttributes));
+            LOG.info("Large sqs message stored to s3. Bucket: {}, identifier: {}, length: {} ", s3BucketToUse, uuid, length);
             System.out.println();
         } else {
             messageAttributes.put(AWS_SQS_LARGE_PAYLOAD, MessageAttributeValue.builder().dataType("String").stringValue(JsonUtil.mapToJson(map)).build());
