@@ -52,6 +52,6 @@ public class SendToSqsRoute {
 
 //        sqsOperations.send(sqsSendOptions -> sqsSendOptions.queue("embriq-volueagent-volueadapter").headers(agentSqsHeader).payload(qfEvent));
         sqsTemplate.send(sqsSendOptions -> sqsSendOptions.queue("embriq-volueagent-volueadapter").payload(qfEvent));
-        LOG.info("Mesasge sent");
+        LOG.info("Message sent");
     }
 }
