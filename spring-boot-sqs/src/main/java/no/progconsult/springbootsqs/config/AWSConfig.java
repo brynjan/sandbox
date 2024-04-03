@@ -55,12 +55,10 @@ public class AWSConfig {
         // add more Options
     }
 
-
     @Bean
     SqsExtendedClient sqsExtendedClient(AwsCredentialsProvider awsCredentialsProvider, Environment env) {
         return new SqsExtendedClient(awsCredentialsProvider, Region.of("eu-west-1"), env.getRequiredProperty("sqs.kms.cmk"), env.getRequiredProperty("sqs.s3.bucket"));
     }
-
 
     @Bean
     SqsMessagingMessageConverter sqsMessagingMessageConverter(SqsExtendedClient sqsExtendedClient, MessageConverter messageConverter) {
@@ -69,9 +67,8 @@ public class AWSConfig {
         return converter;
     }
 
-
     @Bean
-    SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, SqsMessagingMessageConverter sqsMessagingMessageConverter, @Value("${sqs.poll.timeout}") Duration pollTimeout, SqsBackOff sqsBackOff) {
+    SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, SqsMessagingMessageConverter sqsMessagingMessageConverter, @Value("${sqs.poll.timeout}") Duration pollTimeout, no.progconsult.springbootsqs.config.ErrorHandler errorHandler) {
         return SqsMessageListenerContainerFactory
                 .builder()
                 .configure(options -> options
@@ -80,27 +77,7 @@ public class AWSConfig {
                         .messageConverter(sqsMessagingMessageConverter))
                 .sqsAsyncClient(sqsAsyncClient)
                 .messageInterceptor(new BreadcrumbMessageInterceptor())
-                .errorHandler(new ErrorHandler<Object>() {
-                    @Override
-                    public void handle(Message<Object> message, Throwable t) {
-                        // error handling logic
-
-                        QueueMessageVisibility queueMessageVisibility = (QueueMessageVisibility) message.getHeaders().get("Sqs_VisibilityTimeout");
-                        String receiptHandle = message.getHeaders().get("Sqs_ReceiptHandle").toString();
-
-                        String approximateReceiveCount = Optional.ofNullable(message.getHeaders().get("Sqs_Msa_ApproximateReceiveCount")).map(Object::toString).orElse(null);
-
-                        int nextVisibilityTimeoutSeconds = sqsBackOff.calculateNextVisibilityTimeoutSeconds(approximateReceiveCount);
-                        queueMessageVisibility.changeToAsync(nextVisibilityTimeoutSeconds);
-
-                        LOG.info("ChangeMessageVisibility nextVisibilityTimeout: {} seconds, receiptHandle: {}", nextVisibilityTimeoutSeconds, receiptHandle);
-                        LOG.error("Exception encountered while processing message. {}", t.getMessage());
-                        LOG.info("Stacktrace", t);
-
-
-                        System.out.println();
-                    }
-                })
+                .errorHandler(errorHandler)
                 .build();
     }
 
