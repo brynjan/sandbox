@@ -1,6 +1,7 @@
 package no.progconsult.springbootsqs.config;
 
 import no.embriq.quant.flow.typelib.common.QFEvent;
+import no.progconsult.springbootsqs.common.SilentRollbackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ public class SpringBootSqsRoute {
 
     public void processMessage(final QFEvent qfEvent){
         LOG.info("Inside route");
-        throw new RuntimeException("test");
+        throw new SilentRollbackException("test");
     }
 
 }

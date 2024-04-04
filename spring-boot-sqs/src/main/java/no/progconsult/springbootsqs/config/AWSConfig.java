@@ -1,8 +1,6 @@
 package no.progconsult.springbootsqs.config;
 
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
-import io.awspring.cloud.sqs.listener.QueueMessageVisibility;
-import io.awspring.cloud.sqs.listener.errorhandler.ErrorHandler;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import io.awspring.cloud.sqs.support.converter.SqsMessagingMessageConverter;
 import no.embriq.flow.aws.auth.AmazonCredentialsProvider;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -24,7 +21,6 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
 import java.time.Duration;
-import java.util.Optional;
 
 
 @Configuration
@@ -68,7 +64,7 @@ public class AWSConfig {
     }
 
     @Bean
-    SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, SqsMessagingMessageConverter sqsMessagingMessageConverter, @Value("${sqs.poll.timeout}") Duration pollTimeout, no.progconsult.springbootsqs.config.ErrorHandler errorHandler) {
+    SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient, SqsMessagingMessageConverter sqsMessagingMessageConverter, @Value("${sqs.poll.timeout}") Duration pollTimeout, SqsReceiverErrorHandler sqsReceiverErrorHandler) {
         return SqsMessageListenerContainerFactory
                 .builder()
                 .configure(options -> options
@@ -77,7 +73,7 @@ public class AWSConfig {
                         .messageConverter(sqsMessagingMessageConverter))
                 .sqsAsyncClient(sqsAsyncClient)
                 .messageInterceptor(new BreadcrumbMessageInterceptor())
-                .errorHandler(errorHandler)
+                .errorHandler(sqsReceiverErrorHandler)
                 .build();
     }
 
